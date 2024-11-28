@@ -1,0 +1,121 @@
+﻿@page
+@using Newtonsoft.Json
+@model ForestChurches.Pages.Admin.Church.IndexModel
+@{
+    Layout = "_Admin";
+    ViewData["Title"] = "Churches | Administration";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Registered Churches</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <form id="createUserForm" method="get" asp-page="/Admin/Users/Register">
+            <div class="input-group mb-3">
+                <input id="usernameInput" type="text" class="form-control" placeholder="Username" name="username" required>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Create User</button>
+                </div>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Denomination</th>
+                        <th>Congregation</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Churchsuite</th>
+                        <th>Website</th>
+                        <th>Parking</th>
+                        <th>Activities</th>
+                        <th>Refreshments</th>
+                        <th>Restrooms</th>
+                        <th>Wheelchair Access</th>
+                        <th>WIFI</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Churches.Count >= 1)
+                    {
+                        @foreach (var church in Model.Churches)
+                        {
+                            <tr>
+                                <td>
+                                    @if (church.Status == "Open")
+                                    {
+                                        <span style="color:green;font-weight:bold;">Open</span>
+                                    }
+
+                                    else if (church.Status == "Closed")
+                                    {
+                                        <span style="color:red;font-weight:bold;">Approved</span>
+                                    }
+                                </td>
+
+                                <td>@church.Name</td>
+                                <td>@church.Description</td>
+                                <td>@church.Denominaion</td>
+                                <td>@church.Congregation</td>
+                                <td>@church.Address</td>
+                                <td>@church.Phone</td>
+                                <td><a href="@church.Churchsuite">@church.Churchsuite</a></td>
+                                <td><a href="@church.Website">@church.Website</a></td>
+                                <td>@church.Parking</td>
+                                <td>@JsonConvert.SerializeObject(church.Activities)</td>
+                                <td>@church.Refreshments</td>
+                                <td>@church.Restrooms</td>
+                                <td>@church.WheelchairAccess</td>
+                                <td>@church.Wifi</td>
+                                <td>
+                                    <form method="post" asp-page-handler="EditUser">
+                                        <a asp-page="Edit" asp-route-id="@church.ID" class="btn btn-primary">Edit</a>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" asp-page-handler="DeleteChurch">
+                                        <input type="hidden" name="value" value="@church.ID" />
+                                        <button class="btn btn-danger" type="submit" onclick="return confirmDelete('@church.Name')">Delete</button>
+                                    </form>
+                                </td>
+
+                                <script>
+                                    function confirmDelete(churchName) {
+                                        if (confirm("Are you sure you want to delete the church (" + churchName + ")?")) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                </script>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <br />
+        <!-- TODO: Create User Botton Here -->
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+<script>
+    document.getElementById('createUserForm').addEventListener('submit', function () {
+        var username = document.getElementById('usernameInput').value;
+        this.action += '?name=' + encodeURIComponent(username);
+    });
+</script>

@@ -1,0 +1,78 @@
+﻿@page
+@model ForestChurches.Pages.Admin.Users.RegisterModel
+@{
+    Layout = "_Admin";
+    ViewData["Title"] = "New User | Administration";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Register a New User...</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <form id="registerForm" asp-page-handler="RegisterUser" enctype="multipart/form-data" method="post">
+            <h2 id="title">Register a new user...</h2>
+
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <!-- Email -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <!-- Password -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="confirm password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!-- Users Roles -->
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <label>Roles</label>
+                    @foreach (var role in Model.Roles)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="Input.Roles" value="@role.Name">
+                            <label class="form-check-label">@role.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Profle Image -->
+            <div class="input-group">
+                <div class="custom-file">
+                    <input asp-for="Input.Image" type="file" class="custom-file-input" accept="image/png image/jpeg" id="customFile">
+                    <label class="custom-file-label" asp-for="Input.Image">Please select a profile image (png and jpg only)</label>
+                </div>
+                <div class="input-group-append">
+                    <span class="input-group-text" id="">Upload</span>
+                </div>
+            </div>
+
+            <br /> 
+            <br />
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<script src="../../plugins/dropzone/min/dropzone.min.js"></script>
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>

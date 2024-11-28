@@ -1,0 +1,105 @@
+﻿@page
+@model ForestChurches.Pages.Admin.Events.IndexModel
+@{
+    Layout = "_Admin";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<style>
+    img {
+        width: 100%;
+    }
+</style>
+
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Registered Churches</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <form id="createUserForm" method="get" asp-page="/Admin/Events/Create">
+            <div class="input-group mb-3">
+                <input id="nameInput" type="text" class="form-control" placeholder="Event Name" name="eventName" required>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Create Event</button>
+                </div>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Address</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Repeats</th>
+                        <th>Church</th>
+                        <th>User</th>
+                        <th>Link</th>
+                        <th>Delete</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Events.GetType() != null && Model.Events.Count >= 1)
+                    {
+                        @foreach (var ChurchEvent in Model.Events)
+                        {
+                            <tr>
+                                <td><img src="data:image;base64,@System.Convert.ToBase64String(ChurchEvent.ImageArray)" /></td>
+                                <td>@ChurchEvent.Name</td>
+                                <td>@ChurchEvent.Description</td>
+                                <td>@ChurchEvent.Address</td>
+                                <td>@ChurchEvent.Date</td>
+                                <td>@ChurchEvent.StartTime - @ChurchEvent.EndTime</td>
+                                <td>@ChurchEvent.Repeats</td>
+                                <td>@ChurchEvent.Church</td>
+                                <td>@ChurchEvent.User</td>
+                                <td class="textarea" style="word-wrap: anywhere"><a href="@ChurchEvent.Link ?? string.empty">@ChurchEvent.Link</a></td>
+                                <td>
+                                    <form method="post" asp-page-handler="DeleteEvent">
+                                        <input type="hidden" name="value" value="@ChurchEvent.ID" />
+                                        <button class="btn btn-danger" type="submit" onclick="return confirmDelete('@ChurchEvent.Name')">Delete</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post">
+                                        <input type="hidden" name="userName" value="@ChurchEvent.ID" />
+                                        <a asp-page="Edit" asp-route-id="@ChurchEvent.ID" class="btn btn-primary">Edit</a>
+                                    </form>
+                                </td>
+
+                                <script>
+                                    function confirmDelete(eventName) {
+                                        if (confirm("Are you sure you want to delete the following event - '" + eventName + "'?")) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                </script>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <br />
+        <!-- TODO: Create User Botton Here -->
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+<script>
+    document.getElementById('createUserForm').addEventListener('submit', function () {
+        var username = document.getElementById('usernameInput').value;
+        this.action += '?username=' + encodeURIComponent(username);
+    });
+</script>

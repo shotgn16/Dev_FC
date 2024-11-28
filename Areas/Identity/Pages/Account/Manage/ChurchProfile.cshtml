@@ -1,0 +1,247 @@
+﻿@page
+@model ForestChurches.Areas.Identity.Pages.Account.Manage.ChurchProfileModel
+@{
+    ViewData["ActivePage"] = ManageNavPages.ChurchProfile;
+
+    string src = "https://i.imgur.com/oLC9RcU.png";
+
+    if (Model.CurrentUser != null && Model.CurrentUser.ImageArray != null)
+    {
+        src = "data:image;base64," + System.Convert.ToBase64String(Model.CurrentUser.ImageArray);
+    }
+}
+<head>
+    <link rel="stylesheet" href="~/css2/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Table.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Modal.css" asp-append-version="true" />
+</head>
+
+<style>
+    .endSection {
+        padding-bottom: calc(3.5rem + 1.0vw);
+        align-items: center;
+    }
+</style>
+
+<div class="container-fluid page-hero">
+    <div class="hero-text">
+        <partial name="_StatusMessage" for="StatusMessage" />
+        <div>
+            <img src="@src" alt="profile picture" />
+        </div>
+        <div class="heading-text">
+            <h1>Welcome back, User!</h1>
+            <p>@Model.CurrentChurch.Name (@Model.CurrentChurch.Status)</p>
+        </div>
+    </div>
+</div>
+
+<partial name="_ManageNav" />
+
+<h1>Update your church information</h1>
+
+<section>
+    <form method="post" asp-page-handler="UpdateChurchProfile">
+        <div class="form-container">
+            <div class="form-floating full-width">
+                <input asp-for="SaveChangesModel.Name" aria-required="true" class="form-control" id="churchName" type="text" placeholder="Church Name" />
+                <label asp-for="SaveChangesModel.Name"></label>
+                <span asp-validation-for="SaveChangesModel.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating full-width">
+                <textarea asp-for="SaveChangesModel.Description" class="form-control" id="churchDescription" placeholder="Church Description" rows="5"></textarea>
+                <label asp-for="SaveChangesModel.Description"></label>
+                <span asp-validation-for="SaveChangesModel.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating half-width">
+                <input asp-for="SaveChangesModel.Denomination" class="form-control" id="denomination" type="text" placeholder="Denomination" />
+                <label asp-for="SaveChangesModel.Denomination"></label>
+                <span asp-validation-for="SaveChangesModel.Denomination" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating half-width">
+                <input asp-for="SaveChangesModel.Congregation" class="form-control" id="congregationSize" type="text" placeholder="Number of Congregants" />
+                <label asp-for="SaveChangesModel.Congregation">Congregation Size</label>
+                <span asp-validation-for="SaveChangesModel.Congregation" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating half-width">
+                <input id="addressInput" asp-for="SaveChangesModel.Address" class="form-control" type="text" placeholder="Church Address" />
+                <label asp-for="SaveChangesModel.Address"></label>
+                <span asp-validation-for="SaveChangesModel.Address" class="text-danger"></span>
+                <button type="button" class="btn btn-success w-100" onclick="getLocation()">Use My Location</button>
+            </div>
+
+            <div class="form-floating half-width">
+                <input asp-for="SaveChangesModel.Phone" class="form-control" id="phone" type="tel" placeholder="Church Phone" />
+                <label asp-for="SaveChangesModel.Phone">Phone</label>
+                <span asp-validation-for="SaveChangesModel.Phone" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating full-width">
+                <input asp-for="SaveChangesModel.Churchsuite" class="form-control" id="churchsuite" type="text" placeholder="Churchsuite link" />
+                <label asp-for="SaveChangesModel.Churchsuite">ChurchSuite (Optional)</label>
+                <span asp-validation-for="SaveChangesModel.Churchsuite" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating half-width">
+                <input asp-for="SaveChangesModel.Website" class="form-control" id="website" type="text" placeholder="Church Website" />
+                <label asp-for="SaveChangesModel.Website">Website</label>
+                <span asp-validation-for="SaveChangesModel.Website" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating half-width">
+                <select class="form-control" asp-for="SaveChangesModel.Parking" id="parking">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <label asp-for="SaveChangesModel.Parking"></label>
+            </div>
+
+            <div class="form-group half-width">
+                <label class="form-check-label listLabel">Facilities</label>
+                <div class="checkbox-list">
+                    <label><input class="form-check-input" type="checkbox" asp-for="SaveChangesModel.Restrooms" /> Restrooms</label>
+                    <label><input class="form-check-input" type="checkbox" asp-for="SaveChangesModel.WheelchairAccess" /> Wheelchair Access</label>
+                    <label><input class="form-check-input" type="checkbox" asp-for="SaveChangesModel.Wifi" /> Free WiFi</label>
+                    <label><input class="form-check-input" type="checkbox" asp-for="SaveChangesModel.Refreshments" /> Refreshments</label>
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="SaveChangesModel.ID" />
+
+            <button type="submit" class="btn btn-success w-100">Update Information</button>
+        </div>
+    </form>
+</section>
+
+<section class="endSection">
+    <form id="update-logo" enctype="multipart/form-data" asp-page-handler="UpdateUserLogo">
+        <label id="fancy-upload-button" for="upload-btn">Choose File (Click Me)</label>
+        <input asp-for="UnprocessedImage" id="upload-btn" type="file" accept="image/png, image/jpeg" hidden />
+        <button type="submit" class="btn btn-success half-width">Upload Logo</button>
+    </form>
+
+    <div class="btn btn_changeImage btn-success">Change Logo</div>
+    <div class="btn btn_markShutdown @(Model.CurrentChurch.Status == "Open" ? "btn-danger" : "btn-success")" onclick="markChurchStatus('@Model.CurrentChurch.Status')">
+        Mark Church as @(Model.CurrentChurch.Status == "Open" ? "Closed" : "Open")
+    </div>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#serviceTimes">Manage Church Service Times</button>
+    <p>Please only use this button <strong>Mark Church as Closed</strong> if your church is closed for long-term maintenance or your church has shutdown and is no longer open to visitors or holding any regular service. Please note that your church WILL NOT appear in a nearby search when your status is set to closed.</p>
+</section>
+
+<div class="modal fade" id="serviceTimes" tabindex="-1" aria-labelledby="serviceTimeslabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceTimeslabel">Manage Church Service Times</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6 col-sm-12">
+                        <h3>Current Service Times</h3>
+
+                        <table class="table transparent-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Note</th>
+                                    <th>Delete Entry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ServiceTimes != null)
+                                {
+                                    @foreach (var service in Model.ServiceTimes)
+                                    {
+                                        <tr>
+                                            <td>@service.Time</td>
+                                            <td>@service.Note</td>
+                                            <td>
+                                                <form method="post" asp-page-handler="RemoveService">
+                                                    <input type="hidden" name="id" value="@service.Id" />
+                                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-12 col-sm-12">
+                        <form method="post" asp-page-handler="AddServiceTime">
+                            <div class="form-container">
+                                <input asp-for="ChurchService.Time" class="form-control" id="serviceTime" type="time" placeholder="9:45..." />
+                                <input asp-for="ChurchService.Note" class="form-control" id="serviceNote" type="text" placeholder="Morning Communion Service" />
+                                <button type="submit" class="w-100 btn btn-success">Add Service</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        const addressInput = document.getElementById("addressInput");
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                addressInput.value = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            $.ajax({
+                url: `/Identity/Account/Manage/ChurchProfile?handler=GetAddress&latitude=${latitude}&longitude=${longitude}`,
+                method: 'GET',
+                success: function (address) {
+                    addressInput.value = address;
+                },
+                error: function (xhr, status, error) {
+                    addressInput.value = "Error retrieving address: " + error;
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function markChurchStatus(currentStatus) {
+            const newStatus = currentStatus === "Open" ? "Closed" : "Open";
+
+            $.ajax({
+                url: `/Identity/Account/Manage/ChurchProfile?handler=MarkChurchStatus&status=${newStatus}`,
+                method: "GET",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    const button = document.querySelector('.btn_markShutdown');
+                    button.textContent = `Mark Church as ${currentStatus === "Open" ? "Open" : "Closed"}`;
+                    button.classList.toggle('btn-danger');
+                    button.classList.toggle('btn-success');
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + xhr.responseText);
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
+}

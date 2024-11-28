@@ -1,0 +1,25 @@
+﻿@model string
+
+@if (!String.IsNullOrEmpty(Model))
+{
+    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
+    <div id="statusMessage" class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @Model
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Set a timeout to hide the alert after 5 seconds (5000 milliseconds)
+            setTimeout(function () {
+                var alertElement = document.getElementById("statusMessage");
+                if (alertElement) {
+                    // Use Bootstrap's dismiss method to hide the alert
+                    var bsAlert = new bootstrap.Alert(alertElement);
+                    bsAlert.close();
+                }
+            }, 5000); // Change this value to adjust the duration the alert is visible
+        });
+    </script>
+}

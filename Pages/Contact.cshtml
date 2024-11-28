@@ -1,0 +1,37 @@
+﻿@page
+@model ForestChurches.Pages.ContactModel
+@{
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="container">
+    <img src="https://i.imgur.com/1yxyCKl.png" alt="Forest Churches Logo" class="logo" />
+
+    <form id="contactForm" method="post">
+        <h2 id="title">Contact Us</h2>
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <!-- Name -->
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Name" type="text" class="form-control" autocomplete="on" aria-required="true" />
+            <label asp-for="Input.Name">Your Name</label>
+            <span asp-validation-for="Input.Name" class="text-danger"></span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Subject" type="text" class="form-control" autocomplete="on" aria-required="true" />
+            <label asp-for="Input.Subject">Subject</label>
+            <span asp-validation-for="Input.Subject" class="text-danger"></span>
+        </div>
+
+        <!-- Message -->
+        <div class="form-floating mb-3">
+            <textarea asp-for="Input.Message" class="form-control" autocomplete="on" aria-required="true" rows="5"></textarea>
+            <label asp-for="Input.Message">Message</label>
+            <span asp-validation-for="Input.Message" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="w-100 btn btn-success">Send</button>
+    </form>

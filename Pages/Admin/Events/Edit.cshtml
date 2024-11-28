@@ -1,0 +1,165 @@
+﻿@page
+@model ForestChurches.Pages.Admin.Events.EditModel
+@{
+    Layout = "_Admin";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<style>
+    .slider {
+        font-size: calc(0.2rem + 1.0vw);
+    }
+
+    .frequencyLabel {
+        margin-bottom: calc(1.0rem + 1.0vw);
+    }
+</style>
+
+<!-- Profile Image -->
+<div class="card card-primary card-outline">
+    <div class="card-body box-profile">
+        <div class="text-center">
+            @if (Model.currentEvent?.ImageArray != null)
+            {
+                <img style="max-width: 100px" src="data:image;base64,@System.Convert.ToBase64String(Model.currentEvent.ImageArray)" />
+            }
+            else if (Model.currentEvent is null || Model.currentEvent.ImageArray is null)
+            {
+                <img style="max-width: 100px" src="https://i.imgur.com/oLC9RcU.png" />                
+            }
+        </div>
+
+        <h3 class="profile-username text-center">@Model.currentEvent.Name</h3>
+
+        <p class="text-muted text-center">@Model.currentEvent.Name</p>
+
+                <div class="tab-pane active" id="settings">
+                    <form class="form-horizontal" asp-page-handler="UpdateEvent" method="post">
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Name" class="col-sm-2 col-form-label">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="@Model.Input.Name" class="form-control" placeholder="Event name...">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Description" class="col-sm-2 col-form-label">Description</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" asp-for="@Model.Input.Description" placeholder="Event description..."></input>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Address" class="col-sm-2 col-form-label">Event Address</label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="@Model.Input.Address" class="form-control" placeholder="Event Address">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Date" class="col-sm-2 col-form-label">Date Of Event</label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="@Model.Input.Date" class="form-control" placeholder="date of event...">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.StartTime" class="col-sm-2 col-form-label">Start Time</label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="@Model.Input.StartTime" class="form-control" placeholder="start time...">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.EndTime" class="col-sm-2 col-form-label">End Time</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" asp-for="@Model.Input.EndTime" placeholder="end time..."></input>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Link" class="col-sm-2 col-form-label">Event Link</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" asp-for="@Model.Input.Link" placeholder="Sign up link..."></input>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="selectedUser" class="col-sm-2 col-form-label">User</label>
+                            <div class="col-sm-10">
+                                <select asp-for="SelectedUsername" class="form-control" id="selectedUser">
+                                    <option value="">Select a user</option>
+                                    @foreach (var user in Model.UserList)
+                                    {
+                                        <option value="@user.Value">@user.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-floating">
+                            <input type="range" class="form-range slider" min="0" max="6" id="repeatEvent">
+                                <input class="range-input" type="hidden" asp-for="Input.Repeats" id="repeatEventTextInput" />
+                            <label class="frequencyLabel" id="frequencyLabel">How often does your event repeat?</label>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Update Information</button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" asp-for="@Model.currentEvent.ID" id="currentEvent_ID" name="id" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rangeInput = document.getElementById('repeatEvent');
+    const repeatEventText = document.getElementById('repeatEventText'); // Span for text equivalent
+    const repeatEventTextInput = document.getElementById('repeatEventTextInput'); // Hidden input for text equivalent
+
+    rangeInput.addEventListener('input', () => {
+        const value = parseInt(rangeInput.value);
+        let label = '';
+
+        switch (value) {
+            case 0:
+                label = 'None';
+                break;
+            case 1:
+                label = 'Daily';
+                break;
+            case 2:
+                label = 'Weekly';
+                break;
+            case 3:
+                label = 'Every 2 weeks';
+                break;
+            case 4:
+                label = 'Every 3 weeks';
+                break;
+            case 5:
+                label = 'Monthly';
+                break;
+            case 6:
+                label = 'Every 2 months';
+                break;
+            default:
+                label = 'None';
+                break;
+        }
+
+        frequencyLabel.textContent = `Repeats: ${label}` ;
+        repeatEventTextInput.value = label;
+    });
+
+        // Initialize the text equivalent on page load
+    rangeInput.dispatchEvent(new Event('input'));
+</script>

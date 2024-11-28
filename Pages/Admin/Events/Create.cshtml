@@ -1,0 +1,157 @@
+﻿@page
+@model ForestChurches.Pages.Admin.Events.CreateModel
+@{
+    Layout = "_Admin";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<style>
+    .slider {
+        font-size: calc(0.2rem + 1.0vw);
+    }
+
+    .frequencyLabel {
+        margin-bottom: calc(1.0rem + 1.0vw);
+    }
+</style>
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Register a New Event...</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+
+        <form id="creationForm" asp-page-handler="CreateEvent" enctype="multipart/form-data" method="post">
+
+            <!-- Event Name -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Name">Event Name</label>
+                    <input type="text" asp-for="Input.Name" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+
+            <!-- Event Description -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Description">Event Description</label>
+                    <input type="text" asp-for="Input.Description" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.Description" class="text-danger"></span>
+            </div>
+
+            <!-- Event Location -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Address">Where will the event be?</label>
+                    <input type="text" asp-for="Input.Address" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+
+            <!-- Event Date -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Date">When will the event be?</label>
+                    <input type="date" asp-for="Input.Date" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.Date" class="text-danger"></span>
+            </div>
+
+            <!-- Event Start Time -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.StartTime">When will it start?</label>
+                    <input type="time" asp-for="Input.StartTime" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.StartTime" class="text-danger"></span>
+            </div>
+
+            <!-- Event End Time -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.EndTime">When will it finish?</label>
+                    <input type="time" asp-for="Input.EndTime" class="form-control" autocomplete="on" aria-required="true" />
+                <span asp-validation-for="Input.EndTime" class="text-danger"></span>
+            </div>
+
+            <!-- Event Link -->
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Link">Any relavant links?</label>
+                    <input type="text" asp-for="Input.Link" class="form-control" autocomplete="on" aria-required="true" value="None" />
+                <span asp-validation-for="Input.Link" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="selectedUser">User</label>
+                <select asp-for="SelectedUsername" class="form-control" id="selectedUser">
+                    <option value="">Select a user</option>
+                    @foreach (var user in Model.UserList)
+                    {
+                        <option value="@user.Value">@user.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-floating">
+                <input type="range" class="form-range slider" min="0" max="6" id="repeatEvent">
+                    <input class="range-input" type="hidden" asp-for="Input.Repeats" id="repeatEventTextInput" />
+                <label class="frequencyLabel" id="frequencyLabel">How often does your event repeat?</label>
+            </div>
+
+            <!-- Event Photo -->
+            <div class="custom-file">
+                <label asp-for="Input.Image">Select an image for your event</label><br />
+                <input asp-for="Input.Image" type="file" class="custom-file-input" accept="image/png image/jpeg" id="customFile">
+            </div>
+
+            <button id="submitEvent" type="submit" class="btn btn-lg btn-primary">Submit</button>
+        </form>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<script src="../../plugins/dropzone/min/dropzone.min.js"></script>
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+
+<script>
+    const rangeInput = document.getElementById('repeatEvent');
+    const repeatEventText = document.getElementById('repeatEventText'); // Span for text equivalent
+    const repeatEventTextInput = document.getElementById('repeatEventTextInput'); // Hidden input for text equivalent
+
+    rangeInput.addEventListener('input', () => {
+        const value = parseInt(rangeInput.value);
+        let label = '';
+
+        switch (value) {
+            case 0:
+                label = 'None';
+                break;
+            case 1:
+                label = 'Daily';
+                break;
+            case 2:
+                label = 'Weekly';
+                break;
+            case 3:
+                label = 'Every 2 weeks';
+                break;
+            case 4:
+                label = 'Every 3 weeks';
+                break;
+            case 5:
+                label = 'Monthly';
+                break;
+            case 6:
+                label = 'Every 2 months';
+                break;
+            default:
+                label = 'None';
+                break;
+        }
+
+        frequencyLabel.textContent = `Repeats: ${label}` ;
+        repeatEventTextInput.value = label;
+    });
+
+        // Initialize the text equivalent on page load
+    rangeInput.dispatchEvent(new Event('input'));
+</script>

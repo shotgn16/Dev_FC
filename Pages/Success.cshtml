@@ -1,0 +1,11 @@
+﻿@page
+@model ForestChurches.Pages.SuccessModel
+@{
+    ViewData["Title"] = Model.SuccessInfo.SuccessTitle; // Set the page title
+}
+
+<div class="success-container">
+    <h1 class="success-title">@Model.SuccessInfo.SuccessTitle</h1>
+    <p class="success-message">@Model.SuccessInfo.SuccessMessage</p>
+    <a asp-page="./Index" class="back-to-home">Back to Home</a>
+</div>

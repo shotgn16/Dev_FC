@@ -1,0 +1,55 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personal Data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    
+    string src = "https://i.imgur.com/oLC9RcU.png";
+
+    if (@Model.CurrentUser.ImageArray.Length > 1)
+    {
+        src = "data:image;base64," + System.Convert.ToBase64String(@Model.CurrentUser.ImageArray);
+    }
+}
+<head>
+    <link rel="stylesheet" href="~/css2/profile.css" asp-append-version="true" />
+</head>
+
+<!-- Beginning of Page header -->
+<div class="container-fluid page-hero">
+    <div class="hero-text">
+        <div>
+            <img src="@src" alt="profile picture" />
+        </div>
+        <div class="heading-text">
+            <h1>Welcome back, User!</h1>
+            <p>@Model.CurrentChurch.Name (@Model.CurrentChurch.Status)</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Nav -->
+<partial name="_ManageNav" />
+
+<!-- Beginning of page content -->
+<section class="data-section">
+    <h1>Manage Your Data</h1>
+    <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+    <p>
+        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+    </p>
+
+    <p>
+        <strong>If you wish to download all information, including any and all information we hold on your church. Please get in contact with us via the <a href="#">Contact Us Page</a></strong>
+    </p>
+    <form id="download-data" asp-page="DownloadPersonalData" method="post">
+        <button class="btn-success btn" type="submit">Download</button><br />
+    </form>
+    <p>
+        <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Delete</a>
+    </p>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

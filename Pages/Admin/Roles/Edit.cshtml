@@ -1,0 +1,46 @@
+﻿@page
+@using ForestChurches.Models
+@model ForestChurches.Pages.Admin.Roles.EditModel
+@{
+    Layout = "_Admin";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Manage Roles | <strong>@Model.Role.Name</strong></h3>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="Role.Id" />
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Allowed/Disallowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.AllPermissions != null)
+                    {
+                        foreach (var permission in Model.AllPermissions)
+                        {
+                            <tr>
+                                <td>@permission.Name</td> <!-- Updated to display permission name -->
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="@permission.Id" name="selectedPermissions" id="@permission.Id" checked="@(Model.Role.RolePermissions?.Any(rp => rp.PermissionId == permission.Id) ?? false)">
+                                        <label class="form-check-label" for="@permission.Id"></label> <!-- Updated to use Permission Id for the label 'for' attribute -->
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</div>

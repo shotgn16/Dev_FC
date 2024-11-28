@@ -1,0 +1,62 @@
+﻿@page
+@model ForestChurches.Pages.Admin.Users.EditModel
+@{
+    Layout = "_Admin";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<!-- Profile Image -->
+<div class="card card-primary card-outline">
+    <div class="card-body box-profile">
+        <div class="text-center">
+            <img style="max-width: 100px" src="https://i.imgur.com/oLC9RcU.png" />
+        </div>
+
+        <h3 class="profile-username text-center">@Model.currentUser.UserName</h3>
+
+                <div class="tab-pane active" id="settings">
+                    <form class="form-horizontal" asp-page-handler="UpdateUser" method="post">
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Email" class="col-sm-2 col-form-label">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" asp-for="@Model.Input.Email" class="form-control" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Phone" class="col-sm-2 col-form-label">Phone</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" asp-for="@Model.Input.Phone" placeholder="Phone"></input>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Roles</label>
+                                <div class="col-sm-10">
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Input.Roles" value="@role.Name" @(Model.Input.Roles.Contains(role.Name) ? "checked" : "")>
+                                        <label class="form-check-label">@role.Name</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="@Model.Input.Password" class="col-sm-2 col-form-label">Password</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" asp-for="@Model.Input.Password" placeholder="Password"></input>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Update Information</button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" asp-for="@Model.currentUser.Id" id="currentUser_Id" name="id" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

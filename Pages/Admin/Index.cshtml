@@ -1,0 +1,33 @@
+﻿@page
+@model ForestChurches.Pages.Admin.IndexModel
+@{
+    Layout = "_Admin";
+}
+<div class="row">
+    <div class="col-md-6">
+        <!-- Info Box -->
+        <div class="small-box bg-gradient-success">
+            <div class="inner">
+                <h3>@Model.registeredChurches</h3>
+                <p>Registered Churches</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+        </div>
+    </div>
+    <!-- /.col -->
+    <div class="col-md-6">
+        <!-- Info Box -->
+        <div class="small-box bg-gradient-info">
+            <div class="inner">
+                <h3>@Model.registeredEvents</h3>
+                <p>Events</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>

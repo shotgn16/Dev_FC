@@ -1,0 +1,61 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["ActivePage"] = ManageNavPages.Index;
+
+    string src = "https://i.imgur.com/oLC9RcU.png";
+
+    @if (Model.Currentuser != null && Model.Currentuser.ImageArray != null && Model.Currentuser.ImageArray.Length > 1)
+    {
+        src = "data:image;base64," + System.Convert.ToBase64String(@Model.Currentuser.ImageArray);
+    }
+}
+
+<head>
+        <link rel="stylesheet" href="~/css2/profile.css" asp-append-version="true" />
+</head>
+
+<!-- Beginning of Page header -->
+<div class="container-fluid page-hero">
+    <div class="hero-text">
+        <partial name="_StatusMessage" for="StatusMessage" />
+        <div>
+            <img src="@src" alt="profile picture" />
+        </div>
+        <div class="heading-text">
+            <h1>Welcome back, User!</h1>
+            <p>@Model.CurrentChurch.Name (@Model.CurrentChurch.Status)</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Nav -->
+<partial name="_ManageNav" />
+
+<!-- Beginning of page content -->
+<section>
+    <h1>Update Your Information</h1><br>
+    <form id="profile-form" class="column-item" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        
+        <!-- Username [Email] -->
+        <div class="form-floating mb-3">
+            <input asp-for="Username" class="form-control" aria-required="true" placeholder="Please enter a valid email" disabled />
+                <label asp-for="Username" class="form-label"></label>
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        
+        <!-- Phone number -->
+        <div class="form-floating mb-3">
+            <input asp-for="Input.PhoneNumber" class="form-control" aria-required="true" placeholder="Please enter your phone number." />
+                <label asp-for="Input.PhoneNumber" class="form-label"></label>
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+        </div>
+        <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-success">Save</button>
+    </form>
+</section>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

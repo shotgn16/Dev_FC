@@ -1,0 +1,270 @@
+﻿@page
+@using ForestChurches.Models
+@using Microsoft.JSInterop
+@using Newtonsoft.Json;
+@model ForestChurches.Pages.NearMeModel
+@{
+}
+<head>
+    <link rel="stylesheet" href="~/css2/Page-header.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Modal.css" asp-append-version="true" />
+
+    <!-- Linking override manually because '--bs-gutter-overide' wasn't applied through inheritance -->
+    <link rel="stylesheet" href="~/css2/Overrides.css" asp-append-version="true" />
+</head>
+<style>
+    .tab-content > .tab-pane {
+        padding: 5vw;
+        padding-bottom: clamp(5rem, 5vw, 15rem);
+    }
+
+    .model {
+        z-index: 1050 !import;
+    }
+</style>
+
+<!-- Beginning of Page header -->
+<div class="container-fluid page-hero">
+    <div class="hero-text">
+        <h1>What's around me?</h1>
+        <p>Get to know what is going on in your local area</p>
+        <button class="btn btn-success">Learn more</button>
+    </div>
+</div>
+
+<!-- Pagination -->
+<ul class="nav nav-pills nav-fill">
+    <li class="nav-item">
+        <a class="nav-link active" id="homeTab" data-bs-toggle="tab" href="#home">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="nearbyChurchesTab" data-bs-toggle="tab" href="#nearbyChurches">Find a church nearby</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="nearbyActivitiesTab" data-bs-toggle="tab" href="#nearbyActivities">Find nearby activities</a>
+    </li>
+</ul>
+
+<!-- Tab Content-->
+<div class="tab-content">
+    <!-- Home Tab-->
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="homeTab">
+        <h1>What is this?</h1>
+        <p>Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui. Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth.</p>
+        <h1>How do I use it?</h1>
+        <p>Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui. Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth.</p>
+    </div>
+    <!-- Find a church nearby -->
+    <div class="tab-pane fade" id="nearbyChurches" role="tabpanel" aria-labelledby="nearbyChurches">
+        <h1>Find a church...</h1>
+        <p>Enter your postcode and click the button to find a church nearby or simply click <a href="#">here</a></p>
+        <form method="post" asp-page-handler="ChurchForm">
+            <div class="mb-3 postalInput">
+                <input type="text" class="form-control" name="postcode" id="postcode" placeholder="Postcode" aria-describedby="postcodeInput">
+            </div>
+            <button type="submit" class="btn btn-success">What's around me!</button>
+        </form>
+    </div>
+
+    <!-- Find near activities tab -->
+    <div class="tab-pane fade" id="nearbyActivities" role="tabpanel" aria-labelledby="nearbyActivities">
+        <h1>Nearby Events</h1>
+        <p>Enter your postcode and click the button to see what events are going on nearby or simply click <a href="#">here</a></p>
+        <form method="post" asp-page-handler="EventForm">
+            <!-- Added class 'text-start' -->
+            <div class="mb-3 postalInput">
+                <input type="text" class="form-control" name="postcode" placeholder="Postcode" aria-describedby="postcodeInput">
+            </div>
+            <button type="submit" class="btn btn-success">What's around me!</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- CONTENT END | START OF DATA MODELS -->
+
+<!-- Data Models : Nearby Churches -->
+<div class="tab-content">
+    <div class="modal fade" id="churchesModal" aria-labelledby="churchesModel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="lead modal-title" id="churchesModalLabel">Pick a Nearby Church</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (Model._places.Count > 0)
+                    {
+                        <ul>
+                            @{
+                                int index = 0;
+                            }
+                            @foreach (var church in Model._places)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <ul id="listContainer">
+                                            <p class="contentHeadings"><strong>Name: </strong>@church.Name</p> <!-- Section Church name [DisplayName] -->
+                                            <p class="contentHeadings"><strong>Description: </strong>@church.Description</p>
+                                            <p class="contentHeadings"><strong>Denomination: </strong>@church.Denominaion</p>
+                                        </ul>
+                                    </div>
+                                    <form method="post" asp-page-handler="DownloadInformation">
+                                        <button class="w-100 btn btn-secondary" id="displayName_@index" name="id" value="@church.ID" type="submit">Download Information</button>
+                                    </form>
+                                    <form onsubmit="event.preventDefault(); handleFormSubmission(@index);">
+                                        <input type="hidden" name="idValue_@index" id="idValue_@index" value="@church.ID" />
+                                        <button class="w-100 btn btn-secondary" type="submit">Send me the Information</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="LoadChurchPage">
+                                        <input type="hidden" name="id" value="@church.ID" />
+                                        <button class="w-100 btn btn-success" type="submit">Find Out More</button> 
+                                    </form>
+                                </div>
+
+                                index++;
+                                <hr style="color:black">
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Data Models : Current Events -->
+@*     <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventsModalLabel">Nearby Events</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Dynamic content for places will go here -->
+                    <div class="modal-body">
+                        @if (Model._events.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var ev in Model._events)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                            <img id="eventLogo" src="data:image;base64,@System.Convert.ToBase64String(ev.ImageArray)" />
+                                        </div>
+                                        <div id="eventContent" class="col-md-9 col-sm-12">
+                                            <p class="contentHeadings"><strong>Name: </strong>@ev.Name</p>
+                                            <p class="contentHeadings"><strong>Description: </strong>@ev.Description</p>
+                                            <p class="contentHeadings"><strong>Address: </strong>@ev.Address</p>
+                                            <p class="contentHeadings"><strong>Date: </strong>@ev.Date</p>
+                                            <p class="contentHeadings"><strong>Runtime: </strong>@ev.StartTime - @ev.EndTime</p>
+                                            <p class="contentHeadings"><strong>Link: </strong>@ev.Link</p>
+                                        </div>
+                                    </div>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Enter Your Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" asp-page-handler="SendInformationWithEmail">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" name="Id" id="emailModalChurchId">
+                        <div class="mb-3">
+                            <label for="userEmail" class="col-form-label">Email:</label>
+                            <input type="email" class="form-control" id="userEmail" name="email" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="emailInfo_BTN btn btn-success">Send Information</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Tab functionality
+        $(document).ready(function () {
+            $("#myTab a").click(function (e) {
+                e.preventDefault();
+                $(this).tab("show");
+            });
+        });
+
+        $(document).ready(function () {
+        @if (Model.ShowPlacesModal)
+        {
+            <text> $('#churchesModal').modal('show'); </text>
+        }
+        @if (Model.ShowEventsModal)
+        {
+            <text>$('#eventsModal').modal('show'); </text>
+        }});
+
+        function handleFormSubmission(index) {
+            var isAuthenticated = @Html.Raw(JsonConvert.SerializeObject(User.Identity.IsAuthenticated));
+            var idInput = document.getElementById('idValue_' + index);
+            if (!isAuthenticated) {
+                // Trigger a modal to ask for the user's email
+                $('#emailModal').modal('show');
+                // Set a hidden input in the email modal with the church ID
+                document.getElementById('emailModalChurchId').value = idInput.value;
+            } else {
+                // If authenticated, create a form and submit it
+                var form = document.createElement('form');
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/NearMe?handler=SendInformationWithEmail");
+                var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                var tokenInput = document.createElement("input");
+                tokenInput.setAttribute("type", "hidden");
+                tokenInput.setAttribute("name", "__RequestVerificationToken");
+                tokenInput.setAttribute("value", token);
+                form.appendChild(tokenInput);
+
+                // Add other inputs as needed
+                document.body.appendChild(form);
+                form.submit();
+                var fn = document.createElement("input");
+                fn.setAttribute("type", "hidden");
+                fn.setAttribute("name", "Id");
+                fn.setAttribute("value", idInput.value);
+
+                form.appendChild(fn);
+                document.body.appendChild(form);
+
+                form.submit();
+            }
+        };
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Check for success message
+            var message = '@TempData["Message"]';
+            if (message) {
+                alert(message);
+            }
+    </script>
+
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+
+    /* Geolocation for events & Churches */
+}
