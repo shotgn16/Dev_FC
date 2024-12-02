@@ -4,7 +4,7 @@
 2. [Technologies](#technologies)
 ### General Info
 ***
-Built using .NET 9.0 - ASP.NET, the forest church app focuses on connecting churches, no matter their denomination, leaders or issues. We are all united in Christ! 
+Built using .NET 9.0 - ASP.NET, the forest church app focuses on connecting churches, no matter their denomination, leaders or issues.
 
 The application will feature a 'Nearby' feature, which will take a users address (Geolocation) and return a list of churches within 5 miles, including key information such as; 
   * The Church Name
