@@ -7,11 +7,9 @@
 5. [FAQs](#faqs)
 ### General Info
 ***
-Forest Churches is not just an application, its a movement! Based on the idea of uniting churches in the Forest Of Dean, forest churches is a web application designed to help point people to church! 
-
 Built using .NET 9.0 - ASP.NET, the forest church app focuses on connecting churches, no matter their denomination, leaders or issues. We are all united in Christ! 
 
-The application will feature a 'NearBy' feature, which will take a users address (Geolocation) and return a list of churches within 5 miles, including key information such as; 
+The application will feature a 'Nearby' feature, which will take a users address (Geolocation) and return a list of churches within 5 miles, including key information such as; 
   * The Church Name
   * The Address
   * The Phone Number 
