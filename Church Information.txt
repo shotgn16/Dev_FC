@@ -1,16 +1,15 @@
 =========================
-Status: Closed
+Status: Open
 =========================
-Church Name: St Matthews & The Minster
-Description: We are a church family in the centre of Cheltenham, together worshipping Jesus and becoming more passionate about Him. We are made up of all ages, backgrounds and situations in life, but are united by our faith in Jesus Christ, a commitment to the Bible as God’s Word, and a desire to share this with others. 
-So whoever you are, we hope you’ll find a home amongst us.
+Church Name: St Johns
+Description: A local baptist church in the center of quiet town.
 Denomination: Anglican
 Congregation: 200-300
 
 Contact Information
-Website: https://www.stmatthewsandtheminster.org/
-Address: St Matthew’s Church, 44 Clarence Street  Cheltenham Gloucestershire, GL50 3PL
-Phone: 01242 519520
+Website: https://stjohnsbaptist.co.uk
+Address: 44 Clarence Street, Cheltnahm, GL50 3PL
+Phone: 076 2934 8138
 
 Facilities
 Wheelchair Church access: Available

@@ -25,14 +25,17 @@ namespace ForestChurches.Pages.Admin.Users
         [TempData]
         public string StatusMessage { get; set; }
 
+        [TempData]
+        public Guid UserID { get; set; }
+
         [BindProperty]
         public Profile Input { get; set; }
         public IList<ChurchRoles> Roles { get; set; }
 
         public EditModel(
-            UserManager<ChurchAccount> userManager, 
-            ForestChurchesContext context, 
-            ILogger<EditModel> logger, 
+            UserManager<ChurchAccount> userManager,
+            ForestChurchesContext context,
+            ILogger<EditModel> logger,
             RoleManager<ChurchRoles> roleManager)
         {
             _context = context;
@@ -41,13 +44,20 @@ namespace ForestChurches.Pages.Admin.Users
             _logger = logger;
         }
 
-        public async void OnGet(string id)
-        {   
-            currentUser = await _userManager
-                .FindByIdAsync(id);
+        public IActionResult OnGet(Guid id)
+        {
+            UserID = id;
 
-            var userRoles = await _userManager
-                .GetRolesAsync(currentUser);
+            currentUser = _userManager
+                .FindByIdAsync(id.ToString()).Result;
+
+            if (currentUser == null)
+            {
+                return NotFound($"Unable to load user with ID '{id}'.");
+            }
+
+            var userRoles = _userManager
+                .GetRolesAsync(currentUser).Result;
 
             Input = new Profile
             {
@@ -57,31 +67,34 @@ namespace ForestChurches.Pages.Admin.Users
             };
 
             Roles = _roleManager.Roles.ToList();
+
+            return Page();
         }
 
         // Method for updated profile information
-        public async Task<IActionResult> OnPostUpdateUser(string id)
-        { 
+        public async Task<IActionResult> OnPostUpdateUser(Guid id)
+        {
             try
             {
-                var user = await _userManager.FindByIdAsync(id); 
+                var user = await _userManager.FindByIdAsync(id.ToString());
 
                 if (user == null)
                 {
                     _logger.LogError("User not found: " + Input.Email);
                     StatusMessage = $"User '{id} not found...";
+                    return RedirectToPage("./Index");
                 }
 
                 // Adds user to role...
                 var userRoles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, userRoles);
 
-                if (Input.Roles != null) 
+                if (Input.Roles != null)
                 {
                     await _userManager.AddToRolesAsync(user, Input.Roles);
                     user.Role = string.Join(", ", Input.Roles ?? null);
                 }
-                
+
                 // Update the properties that have changed
                 user.Email = Input.Email ?? string.Empty;
                 user.PhoneNumber = Input.Phone ?? string.Empty;
@@ -95,7 +108,6 @@ namespace ForestChurches.Pages.Admin.Users
                 await _userManager.UpdateAsync(user);
 
                 StatusMessage = $"User '{user.Email}' successfully updated...";
-                return RedirectToPagePermanentPreserveMethod("./Index");
             }
 
             catch (Exception ex)
@@ -103,7 +115,7 @@ namespace ForestChurches.Pages.Admin.Users
                 _logger.LogError(ex.Message, ex);
             }
 
-            return RedirectToPagePermanentPreserveMethod("./Index");
+            return RedirectToPage("./Index");
         }
     }
 }

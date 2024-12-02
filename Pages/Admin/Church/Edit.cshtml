@@ -4,7 +4,6 @@
     Layout = "_Admin";
     ViewData["Title"] = "Edit Church | Administration";
 }
-
 <style>
     .checkbox-list {
         padding-left: calc(0.8rem + 0.5vw);
@@ -20,10 +19,10 @@
             <img style="max-width: 100px" src="https://i.imgur.com/oLC9RcU.png" />
         </div>
 
-    <h3 class="profile-username text-center">@Model.Church.Name</h3>
+        <h3 class="profile-username text-center">@Model.Church?.Name</h3>
 
-    <div class="tab-pane active" id="settings">
-        <form class="form-horizontal" asp-page-handler="UpdateChurch" method="post">
+        <div class="tab-pane active" id="settings">
+            <form class="form-horizontal" asp-page-handler="UpdateChurch" method="post" id="editForm">
                 <div class="form-floating full-width">
                     <input asp-for="SaveChangesModel.Name" aria-required="true" class="form-control" id="churchName" type="text" placeholder="Church Name" />
                     <label asp-for="SaveChangesModel.Name"></label>
@@ -90,8 +89,72 @@
                     </div>
                 </div>
 
-                <input type="hidden" value="@Model.SaveChangesModel.ID" for="id" />
+                <!-- Activities -->
+                <div class="form-group full-width">
+                    <label>Activities</label>
+                    <table class="table transparent-table" id="activitiesTable">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Delete Entry</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.SaveChangesModel.Activities != null)
+                            {
+                                @foreach (var activity in Model.SaveChangesModel.Activities)
+                                {
+                                    <tr>
+                                        <td>@activity</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger" onclick="removeActivity('@activity')">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <input type="text" class="form-control" id="newActivity" placeholder="Add activity" />
+                    <button type="button" class="btn btn-info" onclick="addActivity()">Add Activity</button>
+                </div>
 
-                <button type="submit" class="btn btn-primary w-100">Update Information</button>
-        </form>
-    </div>
+                <input type="hidden" value="@Model.SaveChangesModel.ID" for="id" />
+                <input type="hidden" name="Activities" id="activitiesInput" />
+
+                <button type="submit" class="btn btn-primary w-100" onclick="submitForm()">Update Information</button>
+            </form>
+        </div>
+
+        <script>
+            function addActivity() {
+                var newActivity = document.getElementById('newActivity').value;
+                if (newActivity) {
+                    var table = document.getElementById('activitiesTable').getElementsByTagName('tbody')[0];
+                    var newRow = table.insertRow();
+                    var cell1 = newRow.insertCell(0);
+                    var cell2 = newRow.insertCell(1);
+                    cell1.innerHTML = newActivity;
+                    cell2.innerHTML = '<button type="button" class="btn btn-danger" onclick="removeActivity(\'' + newActivity + '\')">Delete</button>';
+                    document.getElementById('newActivity').value = '';
+                }
+            }
+
+            function removeActivity(activity) {
+                var table = document.getElementById('activitiesTable').getElementsByTagName('tbody')[0];
+                for (var i = 0, row; row = table.rows[i]; i++) {
+                    if (row.cells[0].innerText === activity) {
+                        table.deleteRow(i);
+                        break;
+                    }
+                }
+            }
+
+            function submitForm() {
+                var table = document.getElementById('activitiesTable').getElementsByTagName('tbody')[0];
+                var activities = [];
+                for (var i = 0, row; row = table.rows[i]; i++) {
+                    activities.push(row.cells[0].innerText);
+                }
+                document.getElementById('activitiesInput').value = activities.join(',');
+            }
+        </script>

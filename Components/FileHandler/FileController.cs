@@ -20,7 +20,7 @@ namespace ForestChurches.Components.FileManager
                 throw new ArgumentException("Content or filename cannot be null or empty.");
             }
 
-            string fileContent = await GenerateFileContent(content);
+            string fileContent = await GenerateFileContent(content, fileName);
             fileName = EnsureValidFilename(fileName) + ".txt";
 
             try
@@ -41,14 +41,14 @@ namespace ForestChurches.Components.FileManager
             return actionResult;
         }
 
-        private async Task<string> GenerateFileContent(ChurchInformation content)
+        private async Task<string> GenerateFileContent(ChurchInformation content, string filename)
         {
             StringBuilder fileContent = new StringBuilder();
             string openingHours = await returnOpeningHours(content);
 
             try
             {
-                if (content != null)
+                if (content != null && filename == "Church Information")
                 {
                     fileContent
                         .AppendLine("=========================")
@@ -69,6 +69,11 @@ namespace ForestChurches.Components.FileManager
                         .AppendLine($"WiFi: {(content.Wifi == true ? "Available" : "Unavailable")}")
                         .AppendLine($"Parking: {(content.Parking == true ? "Available" : "Unavailable")}")
                         .AppendLine("\n\n" + openingHours);
+                }
+
+                else if (content != null && filename == "Event Information")
+                {
+
                 }
 
                 else if (content == null)

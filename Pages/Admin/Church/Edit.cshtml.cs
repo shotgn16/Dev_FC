@@ -20,20 +20,38 @@ namespace ForestChurches.Pages.Admin.Church
             _userManager = userManager;
             _context = context;
             _logger = logger;
-        }
 
+            Church = _context.ChurchInformation.Where(c => c.ID == ChurchID).FirstOrDefault();
+            if (Church == null)
+            {
+                StatusMessage = "Error: Church not found.";
+            }
+        }
         [BindProperty]
         public ProfileUpdateModel SaveChangesModel { get; set; }
+
+        [BindProperty]
+        public string NewActivity { get; set; }
+
+        [BindProperty]
+        public string Activities { get; set; }
+
         public ChurchInformation Church { get; private set; }
 
         [TempData]
+        internal string ChurchID { get; set; }
+
+        [TempData]
         public string StatusMessage { get; set; }
+
 
         public IActionResult OnGet(string id)
         {
             try
             {
                 Church = _context.ChurchInformation.Where(c => c.ID == id).FirstOrDefault();
+                ChurchID = id;
+
                 if (Church == null)
                 {
                     StatusMessage = "Error: Church not found.";
@@ -55,7 +73,8 @@ namespace ForestChurches.Pages.Admin.Church
                     Restrooms = Church.Restrooms,
                     WheelchairAccess = Church.WheelchairAccess,
                     Wifi = Church.Wifi,
-                    Refreshments = Church.Refreshments
+                    Refreshments = Church.Refreshments,
+                    Activities = Church.Activities
                 };
             }
             catch (Exception ex)
@@ -64,6 +83,25 @@ namespace ForestChurches.Pages.Admin.Church
             }
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostAddActivity()
+        {
+            if (!string.IsNullOrWhiteSpace(NewActivity))
+            {
+                SaveChangesModel.Activities.Add(NewActivity);
+                NewActivity = string.Empty;
+            }
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostRemoveActivity(string activity)
+        {
+            if (!string.IsNullOrWhiteSpace(activity))
+            {
+                SaveChangesModel.Activities.Remove(activity);
+            }
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostUpdateChurch()
@@ -90,6 +128,9 @@ namespace ForestChurches.Pages.Admin.Church
                     return Page();
                 }
 
+                // Update the activities list
+                SaveChangesModel.Activities = Activities?.Split(',').ToList() ?? new List<string>();
+
                 church.Name = SaveChangesModel.Name;
                 church.Description = SaveChangesModel.Description;
                 church.Denominaion = SaveChangesModel.Denomination;
@@ -103,17 +144,21 @@ namespace ForestChurches.Pages.Admin.Church
                 church.WheelchairAccess = SaveChangesModel.WheelchairAccess;
                 church.Wifi = SaveChangesModel.Wifi;
                 church.Refreshments = SaveChangesModel.Refreshments;
+                church.Activities = SaveChangesModel.Activities;
+
+                StatusMessage = $"Your Church ({church.Name}) was successfully updated!";
 
                 _context.Update(church);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while updating ({SaveChangesModel.Name}).");
+                _logger.LogError(ex, $"An error occurred while updating ({SaveChangesModel?.Name}).");
+                StatusMessage = "Error: An unexpected error occurred. Please try again later.";
                 return Page();
             }
 
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
 
     }

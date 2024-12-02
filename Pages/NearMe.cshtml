@@ -57,34 +57,35 @@
     <!-- Find a church nearby -->
     <div class="tab-pane fade" id="nearbyChurches" role="tabpanel" aria-labelledby="nearbyChurches">
         <h1>Find a church...</h1>
-        <p>Enter your postcode and click the button to find a church nearby or simply click <a href="#">here</a></p>
+        <p>Enter your postcode and click the button to find a church nearby or simply click the button below.</p>
         <form method="post" asp-page-handler="ChurchForm">
             <div class="mb-3 postalInput">
-                <input type="text" class="form-control" name="postcode" id="postcode" placeholder="Postcode" aria-describedby="postcodeInput">
+                <input type="text" class="form-control" name="postcode" id="addressInput" placeholder="Postcode" aria-describedby="postcodeInput">
             </div>
             <button type="submit" class="btn btn-success">What's around me!</button>
+            <button type="button" class="btn btn-success" onclick="getLocation()">Use my Location</button>
         </form>
     </div>
 
     <!-- Find near activities tab -->
     <div class="tab-pane fade" id="nearbyActivities" role="tabpanel" aria-labelledby="nearbyActivities">
         <h1>Nearby Events</h1>
-        <p>Enter your postcode and click the button to see what events are going on nearby or simply click <a href="#">here</a></p>
+        <p>Enter your postcode and click the button to see what events are going on nearby or simply click the button below.</p>
         <form method="post" asp-page-handler="EventForm">
             <!-- Added class 'text-start' -->
             <div class="mb-3 postalInput">
-                <input type="text" class="form-control" name="postcode" placeholder="Postcode" aria-describedby="postcodeInput">
+                <input type="text" class="form-control" id="addressInput2" name="postcode" placeholder="Postcode" aria-describedby="postcodeInput">
             </div>
             <button type="submit" class="btn btn-success">What's around me!</button>
+            <button type="button" class="btn btn-success" onclick="getLocation()">Use my Location</button>
         </form>
     </div>
 </div>
 
 
 <!-- CONTENT END | START OF DATA MODELS -->
-
-<!-- Data Models : Nearby Churches -->
 <div class="tab-content">
+    <!-- Chuch Model-->
     <div class="modal fade" id="churchesModal" aria-labelledby="churchesModel" aria-hidden="true" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -134,34 +135,39 @@
 
 
     <!-- Data Models : Current Events -->
-@*     <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
+    <!-- Data Models : Current Events -->
+    <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModal" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="eventsModalLabel">Nearby Events</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body d-flex justify-content-center">
                     <!-- Dynamic content for places will go here -->
                     <div class="modal-body">
                         @if (Model._events.Count > 0)
                         {
-                            <ul>
-                                @foreach (var ev in Model._events)
+                            <ul class="list-unstyled">
+                                @foreach (var listedEvent in Model._events)
                                 {
-                                    <div class="row">
-                                        <div class="col-md-3 col-sm-12">
-                                            <img id="eventLogo" src="data:image;base64,@System.Convert.ToBase64String(ev.ImageArray)" />
-                                        </div>
-                                        <div id="eventContent" class="col-md-9 col-sm-12">
-                                            <p class="contentHeadings"><strong>Name: </strong>@ev.Name</p>
-                                            <p class="contentHeadings"><strong>Description: </strong>@ev.Description</p>
-                                            <p class="contentHeadings"><strong>Address: </strong>@ev.Address</p>
-                                            <p class="contentHeadings"><strong>Date: </strong>@ev.Date</p>
-                                            <p class="contentHeadings"><strong>Runtime: </strong>@ev.StartTime - @ev.EndTime</p>
-                                            <p class="contentHeadings"><strong>Link: </strong>@ev.Link</p>
+                                    <div class="row justify-content-center">
+                                        <div class="col-12">
+                                            <ul>
+                                                <img src="data:image;base64,@System.Convert.ToBase64String(listedEvent.ImageArray)" class="card-img-top card-image mx-auto" alt="@listedEvent.Name">
+                                                <p class="contentHeadings"><strong>@listedEvent.Name</strong></p> <!-- Section Church name [DisplayName] -->
+                                                <p class="contentHeadings">@listedEvent.Description</p>
+                                                <br />
+                                                <p class="contentHeadings"><strong>Location: </strong>@listedEvent.Address</p>
+                                                <p class="contentHeadings"><strong>Date: </strong>@listedEvent.Date.ToString("dddd, dd MMMM yyyy")</p>
+                                                <p class="contentHeadings"><strong>Time: </strong>@listedEvent.StartTime.ToString("HH:mm") - @listedEvent.EndTime.ToString("HH:mm")</p>
+                                                <p class="contentHeadings"><strong>Will this event be on again? </strong>@listedEvent.Repeats</p>
+                                                <br />
+                                                <p>This event is hosted by <strong>@listedEvent.Church</strong></p>
+                                            </ul>
                                         </div>
                                     </div>
+                                    <hr style="color:black">
                                 }
                             </ul>
                         }
@@ -169,7 +175,7 @@
                 </div>
             </div>
         </div>
-    </div> *@
+    </div>
 
     <!-- Email Modal -->
     <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
@@ -215,7 +221,8 @@
         @if (Model.ShowEventsModal)
         {
             <text>$('#eventsModal').modal('show'); </text>
-        }});
+        }
+        });
 
         function handleFormSubmission(index) {
             var isAuthenticated = @Html.Raw(JsonConvert.SerializeObject(User.Identity.IsAuthenticated));
@@ -261,10 +268,42 @@
             if (message) {
                 alert(message);
             }
+        });
     </script>
 
     <script src="/_framework/aspnetcore-browser-refresh.js"></script>
 
+    <!-- Geolocation --> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+            const addressInput = document.getElementById("addressInput");
+            const addressInput2 = document.getElementById("addressInput2")
 
-    /* Geolocation for events & Churches */
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    addressInput.value = "Geolocation is not supported by this browser.";
+                }
+            }
+
+            function showPosition(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                $.ajax({
+                    url: `/NearMe?handler=GetAddress&latitude=${latitude}&longitude=${longitude}`,
+                    method: 'GET',
+                    success: function (address) {
+                        addressInput.value = address;
+                        addressInput2.value = address;
+                    },
+                    error: function (xhr, status, error) {
+                        addressInput.value = "Error retrieving address " + error;
+                        addressInput2.value = "Error retrieving address" + error;
+                        console.error('Error:', error);
+                    }
+                });
+            }
+</script>
 }

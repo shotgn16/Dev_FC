@@ -16,7 +16,7 @@ namespace ForestChurches.Pages
 {
     public class NearMeModel : PageModel
     {
-        private GoogleInterface _googleInterface;
+        private GoogleInterface _googleAPI;
         private PostcodeValidatorInterface _iPostcode;
         private FileInterface _fileInterface;
         private ILogger<NearMeModel> _logger;
@@ -44,7 +44,7 @@ namespace ForestChurches.Pages
             UserManager<ChurchAccount> userManager,
             ILogger<NearMeModel> logger)
         {
-            this._googleInterface = GoogleInterface;
+            this._googleAPI = GoogleInterface;
             this._context = context;
             this._mailRepository = mailRepository;
             this._fileInterface = fileInterface;
@@ -66,9 +66,9 @@ namespace ForestChurches.Pages
                 postcode = postcode.ToUpper();
                 ViewData["postcode"] = postcode;
 
-                await _iPostcode.ValidatePostcodeAsync(postcode);
+                //await _iPostcode.ValidatePostcodeAsync(postcode);
 
-                double[] inputCoordinates = await _googleInterface.ConvertToCoordinates(postcode);
+                double[] inputCoordinates = await _googleAPI.ConvertToCoordinates(postcode);
                 double latitude = inputCoordinates[0];
                 double longtitude = inputCoordinates[1];
 
@@ -116,39 +116,47 @@ namespace ForestChurches.Pages
             return R * c; // Distance in kilometers
         }
 
-        //public async Task<IActionResult> OnPostEventForm(string postcode)
-        //{
-        //    try
-        //    {
-        //        postcode = postcode.ToUpper();
-        //        ViewData["postcode"] = postcode;
+        public async Task<IActionResult> OnPostEventForm(string postcode)
+        {
+            try
+            {
+                postcode = postcode.ToUpper();
+                ViewData["postcode"] = postcode;
 
-        //        await _iPostcode.ValidatePostcodeAsync(postcode);
+                //await _iPostcode.ValidatePostcodeAsync(postcode);
 
-        //        double[] coordinates = await _googleInterface.ConvertToCoordinates(postcode);
-        //        double latitude = coordinates[0];
-        //        double longtitude = coordinates[1];
+                double[] userCoordinates = await _googleAPI.ConvertToCoordinates(postcode);
+                double userLatitude = userCoordinates[0];
+                double userLongitude = userCoordinates[1];
 
-        //        var events = await _context.Events.ToListAsync();
+                var events = await _context.Events.ToListAsync();
+                var eventDistances = new List<(EventsModel Event, double Distance)>();
 
-        //        var orderedEvents = events
-        //            .Select(ev => new
-        //            {
-        //                Event = ev,
-        //                Distance = HavarsineDistance()
-        //            })
-        //            .OrderBy(x => x.Distance)
-        //            .ToList();
+                foreach (var ev in events)
+                {
+                    double[] eventCoordinates = await _googleAPI.ConvertToCoordinates(ev.Address);
+                    double eventLatitude = eventCoordinates[0];
+                    double eventLongitude = eventCoordinates[1];
 
-        //        ShowEventsModal = true;
-        //    }
+                    double distance = HavarsineDistance(userLatitude, userLongitude, eventLatitude, eventLongitude);
+                    eventDistances.Add((ev, distance));
+                }
 
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //    return Page();
-        //}
+                var orderedEvents = eventDistances
+                    .OrderBy(x => x.Distance)
+                    .Select(x => x.Event)
+                    .ToList();
+
+                _events = orderedEvents;
+                ShowEventsModal = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw ex;
+            }
+            return Page();
+        }
 
         public async Task<IActionResult> OnPostDownloadInformation(string Id)
         {
@@ -207,6 +215,22 @@ namespace ForestChurches.Pages
             TempData["Message"] = $"The information has been sent to '{emailAddress}'. Please be sure to also check your spam folder.";
 
             return RedirectToPage("/NearMe");
+        }
+
+        public async Task<IActionResult> OnGetGetAddressAsync(double latitude, double longitude)
+        {
+            string address = string.Empty;
+
+            try
+            {
+                address = await _googleAPI.ConvertToAddress(latitude, longitude);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving the address.");
+            }
+
+            return Content(address);
         }
     }
 }

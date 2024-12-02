@@ -16,5 +16,6 @@
         public bool WheelchairAccess { get; set; }
         public bool Wifi { get; set; }
         public bool Refreshments { get; set; }
+        public List<string> Activities { get; set; } = new List<string>();
     }
 }
