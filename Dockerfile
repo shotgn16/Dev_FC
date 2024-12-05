@@ -1,4 +1,4 @@
-C# Use the official .NET 9 SDK image to build the app
+# Use the official .NET 9 SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 

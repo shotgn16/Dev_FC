@@ -1,0 +1,112 @@
+﻿@page
+@model ForestChurches.Pages.ChurchModel
+@{
+    Layout = "_Layout";
+
+    string src = "https://i.imgur.com/oLC9RcU.png";
+
+    if (Model.AssociatedUser != null && Model.AssociatedUser.ImageArray != null)
+    {
+        src = "data:image;base64," + System.Convert.ToBase64String(Model.AssociatedUser.ImageArray);
+    }
+}
+<head>
+    <link rel="stylesheet" href="~/css2/Page-header.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Church.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Declarations.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Table.css" asp-append-version="true" />
+</head>
+
+<!-- Beginning of Page header -->
+<div class="container-fluid page-hero">
+    <div class="hero-text">
+        <div>
+            <img src="@src" alt="profile picture" />
+        </div>
+        <div class="heading-text">
+            <h1>@Model.ChurchInformation.Name</h1>
+            <p>@Model.ChurchInformation.Address</p>
+        </div>
+        <div class="tag-holder">
+            <div class="tag"><strong>Denomination</strong> @Model.ChurchInformation.Denominaion</div>
+            <div class="tag"><strong>Congregation</strong> @Model.ChurchInformation.Congregation</div>
+        </div>
+    </div>
+</div>
+
+<!-- Beginning of main content -->
+<div class="container main-content">
+    <div class="content">
+        <!-- Main content goes here -->
+        <p>
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+            when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+            It has survived not only five centuries, but also the leap into electronic typesetting, 
+            remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+            and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </p>
+
+        <!-- Services -->
+        <h2>Services</h2>
+        @if (Model.ChurchInformation.ServiceTimes != null)
+        {
+            foreach (var item in Model.ChurchInformation.ServiceTimes)
+            {
+                <h5><strong>Service</strong> @item.Note</h5>
+                <p><strong>Time</strong> @item.Time</p>
+            }
+        }
+
+        <h2>Contact Information</h2>
+        <p>Email: @Model.AssociatedUser.Email</p>
+        <p>Phone: @Model.AssociatedUser.PhoneNumber</p>
+
+        <h2>Ministries</h2>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="ministriesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Ministry
+            </button>
+            <div class="dropdown-menu" aria-labelledby="ministriesDropdown">
+                <a class="dropdown-item" href="#">Ministry 1</a>
+                <a class="dropdown-item" href="#">Ministry 2</a>
+                <a class="dropdown-item" href="#">Ministry 3</a>
+            </div>
+        </div>
+
+        <h2>Events</h2>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="eventsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Event
+            </button>
+            <div class="dropdown-menu" aria-labelledby="eventsDropdown">
+                <a class="dropdown-item" href="#">Event 1</a>
+                <a class="dropdown-item" href="#">Event 2</a>
+                <a class="dropdown-item" href="#">Event 3</a>
+            </div>
+        </div>
+    </div>
+    <div class="events">
+        <!-- Beginning of page content -->
+        <div class="list-group event-container">
+            @if (Model.ChurchEvents != null)
+            {
+                foreach (var item in Model.ChurchEvents)
+                {
+                    <a href="@item.Link" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@item.Name</h5>
+                            <small>@item.Church</small>
+                        </div>
+                        <p class="list-group-item-description mb-1">@item.Description</p>
+                        <small>@item.Date, @item.StartTime - @item.EndTime</small>
+                    </a>
+                }
+            }
+            else if (Model.ChurchEvents == null)
+            {
+                <a href="#" class="list-group-item">Sorry, this church has no listed events</a>
+            }
+        </div>
+    </div>
+</div>

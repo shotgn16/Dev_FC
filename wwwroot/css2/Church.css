@@ -1,0 +1,84 @@
+﻿@import url("Variables.css");
+
+p {
+    color: white;
+}
+
+.main-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.events {
+    flex: 0 0 300px;
+    margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+    .events {
+        flex: 1 100%;
+        margin-left: 0;
+        margin-top: 20px;
+    }
+}
+
+.list-group-item {
+    background-color: var(--primary-color);
+    color: white;
+    border: var(--primary-color);
+}
+
+    .list-group-item.active {
+        background-color: transparent;
+        border-color: var(--primary-color);
+    }
+
+.list-group-item-description {
+    font-size: calc(0.575rem + 0.3vw);
+}
+
+/* To enable hover effects: Change this here! */
+.list-group-item:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+img {
+    max-width: clamp(8rem, 8vw, 35rem);
+    border-radius: 50%;
+    margin-top: 5vw;
+}
+
+.tag {
+    width: fit-content;
+    background: var(--primary-color);
+    border-radius: 5px;
+    padding: 3px 5px;
+    margin: 1px 5px 1px 0;
+}
+
+.tag-holder {
+    display: flex;
+    justify-content: center;
+}
+
+/* Table overrides */
+
+.table > :not(caption) > * > * {
+    background-color: var(--primary-color);
+    border-bottom-width: 0;
+    color: white;
+    max-width: calc(0.1rem + 1.0vw);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+h5 {
+    color: white;
+}

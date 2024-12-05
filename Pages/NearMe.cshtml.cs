@@ -74,7 +74,7 @@ namespace ForestChurches.Pages
 
                 // Retrieve all churches from the database
                 // WARNING: Currently retrieves ALL church information - MUST BE RESTRICTED
-                var churches = await _context.ChurchInformation.ToListAsync();
+                var churches = await _context.ChurchInformation.Where(s => s.Status == "Open").ToListAsync();
 
                 // Calculate distance and order churches by distance
                 var orderedChurches = churches
