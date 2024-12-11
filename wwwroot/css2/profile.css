@@ -69,7 +69,7 @@ section {
 
 .half-width {
     flex: 1; /* Allow to grow */
-    min-width: 300px; /* Minimum width before stacking */
+    min-width: calc(15.0rem + 1.0vw); /* Minimum width before stacking */
 }
 
 /* Full-width elements should take the full width */
@@ -93,6 +93,8 @@ section {
 #fancy-upload-button {
     border: 2px dashed white;
     padding: 1%;
+    width: 100%;
+    text-align: center;
 }
 
 section {

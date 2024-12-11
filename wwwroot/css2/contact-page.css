@@ -1,0 +1,29 @@
+﻿@import url("Variables.css");
+
+/* Start of Form styling (half-width & full-width) */
+
+.half-width {
+    flex: 1; /* Allow to grow */
+    min-width: calc(15.0rem + 1.0vw); /* Minimum width before stacking */
+}
+
+/* Full-width elements should take the full width */
+.full-width {
+    flex: 0 0 100%; /* Full width */
+}
+
+/* Container for the form sections */
+.form-container {
+    display: flex; /* Use flexbox */
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 15px; /* Space between items */
+}
+
+section {
+    border: 1px solid var(--primary-color);
+    padding-left: 3%;
+    padding-right: 3%;
+    padding-top: 1.5rem;
+    max-width: 85%;
+    margin: auto;
+}

@@ -8,26 +8,43 @@
         <!-- Info Box -->
         <div class="small-box bg-gradient-success">
             <div class="inner">
-                <h3>@Model.registeredChurches</h3>
+                <h3>@Model.registeredChurches.Count()</h3>
                 <p>Registered Churches</p>
             </div>
             <div class="icon">
                 <i class="fas fa-user-plus"></i>
             </div>
         </div>
+
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>@Model.DatabaseSize MB</h3>
+
+                    <p>Database Size</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+            </div>
+        </div>
+
     </div>
     <!-- /.col -->
     <div class="col-md-6">
         <!-- Info Box -->
         <div class="small-box bg-gradient-info">
             <div class="inner">
-                <h3>@Model.registeredEvents</h3>
-                <p>Events</p>
+                <h3>@Model.registeredEvents.Count()</h3>
+                <p>Listed Eventss</p>
             </div>
             <div class="icon">
                 <i class="fas fa-calendar-alt"></i>
             </div>
         </div>
     </div>
+</div>
 
     <script src="/_framework/aspnetcore-browser-refresh.js"></script>

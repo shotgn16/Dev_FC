@@ -14,6 +14,7 @@ using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using ForestChurches.Components.Logging;
 using ForestChurches.Components.Token;
+using ForestChurches.Areas.Identity.Data;
 
 namespace ForestChurches
 {
@@ -42,6 +43,8 @@ namespace ForestChurches
 
             Services.AddTransient<iMailSender, MailSender>();
             Services.AddTransient<CallbackToken>();
+
+            Services.AddTransient<IDatabaseService, DatabaseService>();
 
             // Authoization service registration
             Services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();

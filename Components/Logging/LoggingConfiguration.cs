@@ -26,7 +26,7 @@ namespace ForestChurches.Components.Logging
                             formatProvider: CultureInfo.InvariantCulture
                         )
                         .WriteTo.SQLite(
-                            AppDomain.CurrentDomain.BaseDirectory + @"/logs.db",
+                            AppDomain.CurrentDomain.BaseDirectory + "LOGS.db",
                             "system_logs",
                             restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
                             formatProvider: CultureInfo.InvariantCulture

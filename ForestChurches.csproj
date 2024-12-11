@@ -79,6 +79,9 @@
     <None Update="ForestChurches-Localhost.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="ForestChurches-SelfSigned.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ForestChurches-SelfSigned2.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -116,6 +119,10 @@
 
   <ItemGroup>
     <None Include="ForestChurches.sln" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Performance\" />
   </ItemGroup>
 
 </Project>

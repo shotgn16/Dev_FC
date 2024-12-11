@@ -103,18 +103,18 @@ namespace ForestChurches.Components.Email
             }
         }
 
-        public void SendEmailContactRequest(Guid uid, string un, string email, string msg, string redirectUrl)
+        public void SendEmailContactRequest(Guid uid, string un, string recipientEmail, string senderEmail, string msg, string redirectUrl)
         {
             try {
                 var token = CreateCallback(uid, DateTime.UtcNow.AddDays(1), redirectUrl);
 
                 UserData = new Dictionary<string, string> {
                         { "{template_title}", "Forest Churches Contact Form" },
-                        { "{template_content}", $"Name: {un} <br /><br /> Email: {email} <br /><br /> Message: {msg}" },
+                        { "{template_content}", $"Name: {un} <br /><br /> Email: {senderEmail} <br /><br /> Message: {msg}" },
                         { "{template_button_name}", "View Messages" },
                         { "{template_link}", token }
                     };
-                _mailRepository.StartEmailAsync("support@forestchurches.co.uk", UserData, "Forest Churches Contact Form", "./templates/admin_email.html");
+                _mailRepository.StartEmailAsync(recipientEmail, UserData, "Forest Churches Contact Form", "./templates/admin_email.html");
             }
 
             catch (Exception ex) {

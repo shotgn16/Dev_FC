@@ -2,36 +2,73 @@
 @model ForestChurches.Pages.ContactModel
 @{
 }
+<head>
+    <link rel="stylesheet" href="~/css2/contact-page.css" asp-append-version="true" />
+</head>
+
+<style>
+    img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 5vw;
+        max-width: calc(15rem + 1.0vw)
+    }
+
+    h1 {
+        text-align: center;
+    }
+ </style>
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
 
-<div class="container">
-    <img src="https://i.imgur.com/1yxyCKl.png" alt="Forest Churches Logo" class="logo" />
+<section>
+    <img src="~/img/logo.png" alt="Forest Church Logo" class="center-image" />
+    <h1>Contact Us</h1>
 
     <form id="contactForm" method="post">
-        <h2 id="title">Contact Us</h2>
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <!-- Form container-->
+        <div class="form-container">
+            <!-- Asp Validation -->
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        
+            <!-- Your Name -->
+            <div class="form-floating full-width">
+                <input type="text" asp-for="@Model.Input.Name" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="@Model.Input.Name">Your Name</label>
+                <span asp-validation-for="@Model.Input.Name" class="text-danger"></span>
+            </div>
 
-        <!-- Name -->
-        <div class="form-floating mb-3">
-            <input asp-for="Input.Name" type="text" class="form-control" autocomplete="on" aria-required="true" />
-            <label asp-for="Input.Name">Your Name</label>
-            <span asp-validation-for="Input.Name" class="text-danger"></span>
+            <!-- Subject -->
+            <div class="form-floating half-width">
+                <input type="text" asp-for="@Model.Input.Subject" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="@Model.Input.Subject">Subject</label>
+                <span asp-validation-for="@Model.Input.Subject" class="text-danger"></span>
+            </div>
+
+            <!-- Your Email (Sender Email) -->
+            <div class="form-floating half-width">
+                <input type="email" asp-for="@Model.Input.ClientEmail" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="@Model.Input.ClientEmail">Your Email</label>
+                <span asp-validation-for="@Model.Input.ClientEmail" class="text-danger"></span>
+            </div>
+
+            <!-- Message -->
+            <div class="form-floating full-width">
+                <input type="text" asp-for="@Model.Input.Message" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="@Model.Input.Message">Message</label>
+                <span asp-validation-for="@Model.Input.Message" class="text-danger"></span>
+            </div>
+
+            <!-- Hidden Inputs-->
+            <input type="hidden" value="@Model.Input.Cid" />
+
+            <!-- Submit (Button) -->
+            <button type="submit" class="w-100 btn btn-success">Send Message</button>
         </div>
-
-        <!-- Email -->
-        <div class="form-floating mb-3">
-            <input asp-for="Input.Subject" type="text" class="form-control" autocomplete="on" aria-required="true" />
-            <label asp-for="Input.Subject">Subject</label>
-            <span asp-validation-for="Input.Subject" class="text-danger"></span>
-        </div>
-
-        <!-- Message -->
-        <div class="form-floating mb-3">
-            <textarea asp-for="Input.Message" class="form-control" autocomplete="on" aria-required="true" rows="5"></textarea>
-            <label asp-for="Input.Message">Message</label>
-            <span asp-validation-for="Input.Message" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="w-100 btn btn-success">Send</button>
     </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

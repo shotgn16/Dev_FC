@@ -42,7 +42,8 @@ internal class Program
             // Load certificate
             var keyVaultConfig = builder.Configuration.GetSection("KeyVault");
 
-            var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Production"] : keyVaultConfig["CertificatePath_Development"];
+            //var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Production"] : keyVaultConfig["CertificatePath_Development"];
+            var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Development"] : keyVaultConfig["CertificatePath_Production"];
 
             var fullPath = Path.Combine(directory, certificatePath);
             var certificatePassword = keyVaultConfig["CertificatePassword"];
@@ -61,18 +62,18 @@ internal class Program
 
             var secretClient = new SecretClient(new Uri(keyVaultURL), clientCertificateCredential);
 
-            if (Enviroment == "Production")
+            if (Enviroment == "Development")
             {
                 ConnectionString = secretClient.GetSecretAsync("db-connection-live").Result.Value.Value ?? throw new InvalidOperationException("Connection string not found.");
             }
 
-            else if (Enviroment == "Development")
+            if (Enviroment == "Development")
             {
-                //string host = Environment.GetEnvironmentVariable("MYSQL_HOST");
-                //string database = Environment.GetEnvironmentVariable("MYSQL_DATABASE");
-                //string user = Environment.GetEnvironmentVariable("MYSQL_USER");
-                //string password = Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
-
+                var secret = await secretClient.GetSecretAsync("db-connection-live");
+                ConnectionString = secret.Value.Value ?? throw new InvalidOperationException("Connection string not found.");
+            }
+            else if (Enviroment == "Production")
+            {
                 ConnectionString = builder.Configuration.GetConnectionString("DockerConfiguration");
 
                 if (string.IsNullOrEmpty(ConnectionString))

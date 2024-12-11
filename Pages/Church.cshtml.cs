@@ -1,3 +1,4 @@
+using ForestChurches.Components.Http.Google;
 using ForestChurches.Components.Users;
 using ForestChurches.Data;
 using ForestChurches.Migrations;
@@ -12,8 +13,10 @@ namespace ForestChurches.Pages
     {
         private readonly ForestChurchesContext _context;
         private readonly UserManager<ChurchAccount> _userManager;
-        public ChurchModel(ForestChurchesContext context, UserManager<ChurchAccount> userManager)
+        private readonly GoogleInterface _api;
+        public ChurchModel(ForestChurchesContext context, UserManager<ChurchAccount> userManager, GoogleInterface api)
         {
+            _api = api;
             _context = context;
             _userManager = userManager;
 
@@ -31,6 +34,8 @@ namespace ForestChurches.Pages
         public List<EventsModel> ChurchEvents { get; set; }
 
         public ChurchAccount AssociatedUser { get; set; }
+        internal double Latitude { get; set; }
+        internal double Longitude { get; set; }
 
         public async Task OnGetAsync(Guid id)
         {
@@ -64,6 +69,13 @@ namespace ForestChurches.Pages
                         .Where(variable => variable.User == AssociatedUser.UserName)
                         .ToListAsync();
                 }
+            }
+
+            if (_api != null)
+            {
+                double[] tempCoordiantes = await _api.ConvertToCoordinates(ChurchInformation.Address);
+                Latitude = tempCoordiantes[0];
+                Longitude = tempCoordiantes[1];
             }
         }
     }

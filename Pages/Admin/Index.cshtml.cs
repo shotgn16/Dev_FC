@@ -1,30 +1,43 @@
+using ForestChurches.Areas.Identity.Data;
 using ForestChurches.Components.Users;
 using ForestChurches.Data;
+using ForestChurches.Models;
+using Hangfire.Storage.Monitoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog.Sinks.File;
+using System.Diagnostics;
+using System.Linq;
 
 namespace ForestChurches.Pages.Admin
 {
     [Authorize(Policy = "Admin.Read")]
     public class IndexModel : PageModel
     {
-        private UserManager<ChurchAccount> _userManager;
-        private ForestChurchesContext _context;
+        private readonly UserManager<ChurchAccount> _userManager;
+        private readonly ForestChurchesContext _context;
+        private readonly IDatabaseService _databaseService;
 
-        internal int registeredChurches;
-        internal int registeredEvents;
+        internal List<Models.ChurchInformation> registeredChurches;
+        internal List<EventsModel> registeredEvents;
 
-        public IndexModel(UserManager<ChurchAccount> userManager, ForestChurchesContext context)
+        internal string DatabaseSize = "2.5";
+
+        public IndexModel(UserManager<ChurchAccount> userManager, ForestChurchesContext context, IDatabaseService databaseService)
         {
+            _databaseService = databaseService;
             _userManager = userManager;
             _context = context;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            registeredChurches = _userManager.Users.Count();
-            registeredEvents = _context.Events.Count();
+            registeredChurches = _context.ChurchInformation.OrderByDescending(a => a.ChurchAccount.CreatedDate).ToList();
+            registeredEvents = _context.Events.ToList();
+
+
+            //DatabaseSize = await _databaseService.GetDatabaseSize("forestchurches");
         }
     }
 }
