@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>7648bba3-b25d-4bf1-9206-3f054e7ea863</UserSecretsId>
@@ -119,10 +119,6 @@
 
   <ItemGroup>
     <None Include="ForestChurches.sln" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Performance\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,68 @@
+﻿@page
+@model ForestChurches.Pages.Admin.InviteModel
+@{
+    Layout = "_Admin";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="card">
+    <div class="card-header">
+        <h3>Whitelist Email Addresses</h3>
+    </div>
+
+    <div class="card-body">
+        <form id="registrationInvite" method="post" asp-page-handler="AddWhitelistedUser">
+            <div class="input-group mb-3">
+                <input id="emailInput" type="text" class="form-control" placeholder="Email" name="email" required>
+                 <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Whitelist User</button>
+                 </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table id="InviteTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Email</th>
+                        <th>Invite Expiry</th>
+                        <th>RegistrationDate</th>
+                        <th>Delete</th>
+                        <th>Resend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.invites.Count >= 1)
+                    {
+                        @foreach (var invite in Model.invites)
+                        {
+                            <tr>
+                                <td>@invite.ID</td>
+                                <td>@invite.Status</td>
+                                <td>@invite.Email</td>
+                                <td>@invite.ExpiryDate</td>
+                                <td>@invite.DateOfRegistration</td>
+                                <td>
+                                    <form method="post" asp-page-handler="RemoveWhitelistedUser">
+                                        <input type="hidden" name="email" value="@invite.Email" />
+                                        <button class="btn btn-danger" type="submit">Delete</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" asp-page-handler="ResendInvite">
+                                        <input type="hidden" name="email" value="@invite.Email" />
+                                        <button class="btn btn-primary" type="submit">Resend Register Invite</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.Authorization;
 using ForestChurches.Components.Logging;
 using ForestChurches.Components.Token;
 using ForestChurches.Areas.Identity.Data;
+using ForestChurches.Components.Performance;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using ForestChurches.Services;
 
 namespace ForestChurches
 {
@@ -58,6 +61,8 @@ namespace ForestChurches
             // Http service registration (for handling api requests)
             Services.AddTransient<IHttpWrapper, HttpWrapper>();
             Services.AddTransient<IHttpMethods, ForestChurches.Components.Http.HttpMethods>();
+
+            Services.AddSingleton<IProcessUsageService, ProcessUsageService>();
 
             // Google api service registration
             Services.AddScoped<GoogleInterface, GoogleController>();

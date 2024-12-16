@@ -15,22 +15,6 @@
                 <i class="fas fa-user-plus"></i>
             </div>
         </div>
-
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>@Model.DatabaseSize MB</h3>
-
-                    <p>Database Size</p>
-                </div>
-                <div class="icon">
-                    <i class="fa-solid fa-database"></i>
-                </div>
-            </div>
-        </div>
-
     </div>
     <!-- /.col -->
     <div class="col-md-6">
@@ -45,6 +29,93 @@
             </div>
         </div>
     </div>
+
+    <!-- Whitelsit Count -->
+    <div class="col-md-6">
+        <!-- Info Box -->
+        <div class="small-box bg-gradient-danger">
+            <div class="inner">
+                <h3>@Model.WhitelistCount</h3>
+                <p>Pending Invites</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-clipboard"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newest Regestration -->
+    <div class="col-md-6">
+        <!-- Info Box -->
+        <div class="small-box bg-gradient-danger">
+            <div class="inner">
+                <h3>@Model.WhitelistCount</h3>
+                <p>Newest Member</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-clipboard"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Size [Col-3] -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>@Model.DatabaseSize.ToString("F2") MB</h3>
+
+                <p>Database Size</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-database"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Database Size [Col-3] -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>@Model.LogDatabaseSize.ToString("F2") MB</h3>
+
+                <p>Log Size</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-gears"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- CPU Usage [Col-3] -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>@Math.Round(Model.CPUUsage, 0)%</h3>
+
+                <p>CPU Usage</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Usage [Col-3] -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>@Model.MemoryUsage.ToString("F2") MB</h3>
+
+                <p>Memory Usage</p>
+            </div>
+            <div class="icon">
+                <i class="fa-solid fa-memory"></i>
+            </div>
+        </div>
+    </div>
 </div>
 
-    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>

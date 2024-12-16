@@ -3,62 +3,28 @@
 @{
 }
 <head>
-    <link rel="stylesheet" href="~/css2/Login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css2/Register.css"/>
 </head>
 
-<style>
-    #fancy-upload-button {
-        color: white;
-        width: 100%;
-        height: 100%;
-    }
-
-    footer > .container-fluid {
-        position: fixed;
-    }
-</style>
-
-<partial name="_StatusMessage" model="Model.StatusMessage" />
-
-<section>
-    <form id="register-form" enctype="multipart/form-data" class="form-signin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-        <div class="form-container">
-            
-            <img class="mb-4" src="~/img/logo.png" alt="" width="300" height="200" />
-            <h1 class="mb-3 full-width font-weight-normal">Register an account</h1>
-
-            <!-- Validity -->
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
-            <!-- Email -->
-            <div class="form-floating full-width">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <!-- Password -->
-            <div class="form-floating half-width">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <!-- Password (2nd Time) -->
-            <div class="form-floating half-width">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-
-            <div class="form-container">
-                <button id="registerSubmit" type="submit" class="half-width w-100 btn btn-lg btn-success">Register</button>
-                <div class="half-width custom-file">
-                    <label id="fancy-upload-button" for="upload-btn">Choose Logo (Click Me)</label>
-                    <input asp-for="Input.Image" id="upload-btn" type="file" class="custom-file-input" accept="image/png, image/jpeg" hidden>
-                </div>
-            </div>
-        </div>   
-    </form>
-</section>
+<div class="container">
+    <div class="Register form">
+        <header>
+            <img class="mb-4" src="~/img/logo.png" alt="" width="300" height="200">
+        </header>
+        <form action="#">
+            <input type="text" placeholder="Enter your email">
+            <input type="password" placeholder="Create a password">
+            <input type="password" placeholder="Confirm your password">
+            <input type="button" class="button" value="Signup">
+        </form>
+        <div class="signup">
+            <span class="signup">
+                Already have an account?
+                <label>Login</label>
+            </span>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

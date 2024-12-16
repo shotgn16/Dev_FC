@@ -1,4 +1,5 @@
 ﻿using ForestChurches.Components.Configuration;
+using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using System.Configuration;
 using static ServiceStack.Diagnostics.Events;
@@ -16,27 +17,43 @@ namespace ForestChurches.Areas.Identity.Data
             _environment = enviroment;
         }
 
-        public async Task<string> GetDatabaseSize(string database)
+        public async Task<float> GetLogDatabaseSize()
         {
-            string connectionStringName = _environment.IsDevelopment() ? "db-connection-dev" : "db-connection-live";
-            string connectionString = _configuration.Client.GetSecret(connectionStringName).Value.Value;
+            FileInfo fileInformation = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "LOGS.db");
 
-            // Will be cleaned up later
-            // TESTING
-            string query = @"
-                SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)'
-                FROM information_schema.tables
-                WHERE table_schema = '" + database + "' GROUP BY table_schema;";
+            // Returns the database size in MB
+            return (fileInformation.Length / 1024f) / 1024f;
+        }
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+        public async Task<float> GetDatabaseSize()
+        {
+            var environment = _environment.EnvironmentName;
+            float databaseSize = 0f;
+
+            string connectionString = environment == "Production"
+                ? _configuration.Client.GetSecret("db-connection-live").Value.Value
+                : _configuration.Client.GetSecret("db-connection-dev").Value.Value;
+
+            using (var connection = new MySqlConnection(connectionString))
             {
                 await connection.OpenAsync();
-                using (MySqlCommand command = new MySqlCommand(query, connection))
+
+                using (var command = new MySqlCommand())
                 {
+                    command.Connection = connection;
+                    command.CommandText = "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) " +
+                                          "AS 'Size (MB)' FROM information_schema.tables " +
+                                          "WHERE table_schema = 'forestchurches';";
+
                     var result = await command.ExecuteScalarAsync();
-                    return result != null ? result.ToString() : "0";
+                    if (result != null && float.TryParse(result.ToString(), out float size))
+                    {
+                        databaseSize = size;
+                    }
                 }
             }
+
+            return databaseSize;
         }
     }
 }

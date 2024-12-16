@@ -28,6 +28,7 @@ namespace ForestChurches.Components.Users
                 Email = _configuration.Client.GetSecret("sys-demo-username").Value.Value,
                 UserName = _configuration.Client.GetSecret("sys-demo-username").Value.Value,
                 EmailConfirmed = true,
+                CreatedDate = DateTime.UtcNow,
                 ImageArray = await ConvertLinkToByteArray("https://i.imgur.com/oLC9RcU.png"),
                 Role = Roles.Roles.AuthorizedChurch.ToString()
             };
@@ -84,6 +85,7 @@ namespace ForestChurches.Components.Users
                 Email = _configuration.Client.GetSecret("sys-admin-username").Value.Value,
                 UserName = _configuration.Client.GetSecret("sys-admin-username").Value.Value,
                 EmailConfirmed = true,
+                CreatedDate = DateTime.UtcNow,
                 ImageArray = await ConvertLinkToByteArray("https://i.imgur.com/oLC9RcU.png"),
                 Role = Roles.Roles.SuperAdmin.ToString()
             };
@@ -102,11 +104,11 @@ namespace ForestChurches.Components.Users
                     {
                         ID = Guid.NewGuid().ToString(),
                         ChurchAccountId = superAdminUser.Id,
-                        Name = "St. Paul's Church",
-                        Denominaion = "Anglican",
-                        Website = "https://stpaulsanglican.co.uk",
+                        Name = "demo.church",
+                        Denominaion = "demo.denomination",
+                        Website = "https://demo.church.co.uk",
                         Status = "Open",
-                        Description = "A local anglican church in the center of our busy city.",
+                        Description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
                         Activities = new List<string> { "Baby & Toddler Group", "Friday Fitness", "Home groups" },
                         WheelchairAccess = true,
                         Wifi = true,
@@ -118,10 +120,10 @@ namespace ForestChurches.Components.Users
                             new ServiceTimes { Time = new TimeOnly(9,00), Note = "Early Morning Service" },
                             new ServiceTimes { Time = new TimeOnly(11,00), Note = "Morning Traditional Service" }
                         },
-                        Address = "7250 Red St.",
+                        Address = "33 Walden Road Greenheads, AB42 4NA",
                         Churchsuite = "https://login.churchsuite.com/?account=demo_church",
-                        Congregation = "50-100",
-                        Phone = "077 3454 9108"
+                        Congregation = "20-50",
+                        Phone = "078 5714 0871"
                     };
 
                     _context.ChurchInformation.Add(churchInformation2);

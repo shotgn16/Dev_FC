@@ -2,6 +2,7 @@
 {
     public interface IDatabaseService
     {
-        Task<string> GetDatabaseSize(string database);
+        Task<float> GetLogDatabaseSize();
+        Task<float> GetDatabaseSize();
     }
 }

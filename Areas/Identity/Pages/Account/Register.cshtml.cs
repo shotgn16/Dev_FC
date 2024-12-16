@@ -83,9 +83,11 @@ namespace ForestChurches.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string ReturnUrl { get; set; }
-
-        [TempData]
-        public string[] whitelistedUsers { get; set; }
+        /// <summary>
+        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+        ///     directly from your code. This API may change or be removed in future releases.
+        /// </summary>
+        public List<string> whitelistedUsers { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -128,25 +130,6 @@ namespace ForestChurches.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
             // Custom Parameters
-
-            [Required]
-            [PersonalData]
-            [DataType(DataType.Text)]
-            [Display(Name = "Church Name")]
-            public string ChurchName { get; set; }
-
-            [Required]
-            [PersonalData]
-            [DataType(DataType.Text)]
-            [Display(Name = "Church Denomination")]
-            public string ChurchDenomination { get; set; }
-
-            [Required]
-            [PersonalData]
-            [DataType(DataType.Text)]
-            [Display(Name = "Church Website")]
-            public string ChurchWebsite { get; set; }
-
             [AllowNull]
             [PersonalData]
             public byte[] ImageArray { get; set; }
@@ -162,88 +145,94 @@ namespace ForestChurches.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            whitelistedUsers = _context.WhitelistedUsers
-                .Select(a => a.Email)
-                .ToArray();
-
             Input = new InputModel();
             Input.Email = email;
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid && _registrationGenerator.ValidateEmail(Input.Email) == true && whitelistedUsers != null && whitelistedUsers.Contains(Input.Email))
+            try
             {
-                var user = CreateUser();
+                whitelistedUsers = await _context.WhitelistedUsers.Select(a => a.Email).ToListAsync();
 
-                user.CreatedDate = DateTime.UtcNow;
-
-                if (Input.Image == null) {
-                    user.ImageArray = await _iImage.ConvertToByteArrayFromUrl("https://i.imgur.com/oLC9RcU.png");
-                }
-
-                else if (Input.Image != null) {
-                    user.ImageArray = await _iImage.ConvertToByteArray(Input.Image);
-                }
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
+                returnUrl ??= Url.Content("~/");
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                if (ModelState.IsValid && _registrationGenerator.ValidateEmail(Input.Email) == true && whitelistedUsers.Contains(Input.Email))
                 {
-                    _logger.LogInformation("User created a new account with password.");
-                    StatusMessage = $"User '{user.UserName}' successfully registered!";
+                    var user = CreateUser();
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    user.CreatedDate = DateTime.UtcNow;
 
-                    // Mark regisration as a success.
-                    _registrationGenerator.MarkAsCompleted(Input.Email, DateTime.UtcNow);
+                    if (Input.Image == null)
+                    {
+                        user.ImageArray = await _iImage.ConvertToByteArrayFromUrl("https://i.imgur.com/oLC9RcU.png");
+                    }
 
-                    // Send Email ----------------
+                    else if (Input.Image != null)
+                    {
+                        user.ImageArray = await _iImage.ConvertToByteArray(Input.Image);
+                    }
 
-                    var userData = new Dictionary<string, string>()
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User created a new account with password.");
+                        StatusMessage = $"User '{user.UserName}' successfully registered!";
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        // Mark regisration as a success.
+                        _registrationGenerator.MarkAsCompleted(Input.Email, DateTime.UtcNow);
+
+                        var userData = new Dictionary<string, string>()
                         { { "{confirm_email_link}", HtmlEncoder.Default.Encode(callbackUrl) } };
+                        await _mailRepository.StartEmailAsync(Input.Email, userData, "Confirm your email", "./templates/confirm_email.html");
 
-                    await _mailRepository.StartEmailAsync(Input.Email, userData, "Confirm your email", "./templates/confirm_email.html");
 
-                    // ----------------------------
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
                     }
-                    else
+                    foreach (var error in result.Errors)
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                foreach (var error in result.Errors)
+
+                else if (_registrationGenerator.ValidateEmail(Input.Email) == false)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError("Email", "Email is already registered or the registration has expired...");
+                    StatusMessage = "Error: Email is already registered or the registration has expired...";
+                    return Page();
+                }
+
+                else if (!whitelistedUsers.Contains(Input.Email))
+                {
+                    throw new Exception("Error! Unknown email address. Please try again or contact us for further information using the contact forum or email us at 'info@forestchurches.co.uk'.");
                 }
             }
 
-            else if (_registrationGenerator.ValidateEmail(Input.Email) == false)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("Email", "Email is already registered or the registration has expired...");
-                StatusMessage = "Error: Email is already registered or the registration has expired...";
-                return Page();
-            }
+                _logger.LogError(ex.ToString());
 
-            else if (!whitelistedUsers.Contains(Input.Email))
-            {
-                throw new Exception("Error! Unknown email address. Please try again or contact us for further information using the contact forum or email us at 'info@forestchurches.co.uk'.");
+                StatusMessage = ex.Message;
             }
 
             // If we got this far, something failed, redisplay form

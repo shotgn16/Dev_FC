@@ -42,8 +42,7 @@ internal class Program
             // Load certificate
             var keyVaultConfig = builder.Configuration.GetSection("KeyVault");
 
-            //var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Production"] : keyVaultConfig["CertificatePath_Development"];
-            var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Development"] : keyVaultConfig["CertificatePath_Production"];
+            var certificatePath = Enviroment == "Production" ? keyVaultConfig["CertificatePath_Production"] : keyVaultConfig["CertificatePath_Development"];
 
             var fullPath = Path.Combine(directory, certificatePath);
             var certificatePassword = keyVaultConfig["CertificatePassword"];
@@ -64,23 +63,18 @@ internal class Program
 
             if (Enviroment == "Development")
             {
-                ConnectionString = secretClient.GetSecretAsync("db-connection-live").Result.Value.Value ?? throw new InvalidOperationException("Connection string not found.");
-            }
-
-            if (Enviroment == "Development")
-            {
-                var secret = await secretClient.GetSecretAsync("db-connection-live");
-                ConnectionString = secret.Value.Value ?? throw new InvalidOperationException("Connection string not found.");
-            }
-            else if (Enviroment == "Production")
-            {
-                ConnectionString = builder.Configuration.GetConnectionString("DockerConfiguration");
+                var secret = await secretClient.GetSecretAsync("db-connection-dev");
+                ConnectionString = secret.Value.Value;
 
                 if (string.IsNullOrEmpty(ConnectionString))
                 {
-                    var secret = await secretClient.GetSecretAsync("db-local-testing");
-                    ConnectionString = secret.Value.Value;
+                    ConnectionString = builder.Configuration.GetConnectionString("DockerConfiguration");
                 }
+            }
+
+            else
+            {
+                ConnectionString = secretClient.GetSecretAsync("db-connection-live").Result.Value.Value ?? throw new InvalidOperationException("Connection string not found.");
             }
 
             // Configure Database Context & Identity
