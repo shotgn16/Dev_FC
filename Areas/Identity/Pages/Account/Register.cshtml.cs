@@ -13,17 +13,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Diagnostics.CodeAnalysis;
 using ForestChurches.Components.ImageHandler;
-using ForestChurches.Models;
 using ForestChurches.Components.Email;
 using Newtonsoft.Json;
-using System.Net;
 using ForestChurches.Components.Configuration;
 using ForestChurches.Components.UserRegistration;
-using AutoMapper.Configuration.Annotations;
-using ForestChurches.Components.Http.Google;
 using ForestChurches.Components.Users;
 using ForestChurches.Data;
 using Microsoft.EntityFrameworkCore;
+using ServiceStack;
 
 namespace ForestChurches.Areas.Identity.Pages.Account
 {
@@ -37,6 +34,7 @@ namespace ForestChurches.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly ForestChurchesContext _context;
         private readonly iEmail _mailRepository;
+        private readonly iMailSender _mailSender;
         internal readonly Configuration _configuration;
         private readonly iRegistrationGenerate _registrationGenerator; 
 
@@ -48,6 +46,7 @@ namespace ForestChurches.Areas.Identity.Pages.Account
             SignInManager<ChurchAccount> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
+            iMailSender mailSender,
             ImageInterface iImage,
             iEmail mailRepository,
             ForestChurchesContext context,
@@ -59,6 +58,7 @@ namespace ForestChurches.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
+            _mailSender = mailSender;
             _emailSender = emailSender;
             _iImage = iImage;
             _mailRepository = mailRepository;
@@ -94,7 +94,11 @@ namespace ForestChurches.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
+        /// <summary>
+        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+        ///     directly from your code. This API may change or be removed in future releases.
+        /// </summary>        
+        public bool isTokenValid { get; set; } = true;
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -138,7 +142,6 @@ namespace ForestChurches.Areas.Identity.Pages.Account
             [PersonalData]
             public IFormFile Image { get; set; }
         }
-
 
         public async Task OnGetAsync(string returnUrl = null, string email = "")
         {
@@ -194,9 +197,12 @@ namespace ForestChurches.Areas.Identity.Pages.Account
                         // Mark regisration as a success.
                         _registrationGenerator.MarkAsCompleted(Input.Email, DateTime.UtcNow);
 
-                        var userData = new Dictionary<string, string>()
-                        { { "{confirm_email_link}", HtmlEncoder.Default.Encode(callbackUrl) } };
-                        await _mailRepository.StartEmailAsync(Input.Email, userData, "Confirm your email", "./templates/confirm_email.html");
+                        var id = _userManager.FindByEmailAsync(Input.Email);
+                        _mailSender.SendEmailConfirmAccount(id.Id.ConvertTo<Guid>(), Input.Email, callbackUrl);
+
+                        //var userData = new Dictionary<string, string>()
+                        //{ { "{confirm_email_link}", HtmlEncoder.Default.Encode(callbackUrl) } };
+                        //await _mailRepository.StartEmailAsync(Input.Email, userData, "Confirm your email", "./templates/confirm_email.html");
 
 
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)

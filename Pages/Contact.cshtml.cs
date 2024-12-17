@@ -12,6 +12,7 @@ namespace ForestChurches.Pages
     {
         // Dependency Injection
         private readonly iMailSender _mailSender;
+        private readonly ILogger<ContactModel> _logger;
         private readonly ForestChurchesContext _context;
         private readonly UserManager<ChurchAccount> _userManager;
 
@@ -22,8 +23,9 @@ namespace ForestChurches.Pages
         [TempData]
         public string StatusMessage { get; set; }
 
-        public ContactModel(iMailSender mailSender, UserManager<ChurchAccount> userManager, ForestChurchesContext context)
+        public ContactModel(iMailSender mailSender, UserManager<ChurchAccount> userManager, ForestChurchesContext context, ILogger<ContactModel> logger)
         {
+            _logger = logger;
             _context = context;
             _mailSender = mailSender;
             _userManager = userManager;
@@ -44,39 +46,45 @@ namespace ForestChurches.Pages
             }
         }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
-            string recipientEmail = "support@forestchurches.co.uk";
-
-            if (Input.Cid != Guid.Empty)
+            try
             {
-                recipientEmail = _context.ChurchInformation
-                    .Where(a => a.ID == Input.Cid.ToString())
-                    .Select(b => b.ChurchAccount.Email)
-                    .FirstOrDefault();
+                string recipientEmail = "Jack.Barnard19@Outlook.com";
+
+                if (Input.Cid != Guid.Empty)
+                {
+                    recipientEmail = _context.ChurchInformation
+                        .Where(a => a.ID == Input.Cid.ToString())
+                        .Select(b => b.ChurchAccount.Email)
+                        .FirstOrDefault();
+                }
+
+                // Determine the sender email based on user authentication status
+                string senderEmail = User.Identity.IsAuthenticated ? User.Identity.Name : Input.ClientEmail;
+
+                // User must be authenticated as this contact form is ONLY for authenticated users, and will use their authenticated email address as the user contact.
+                if (Input != null && User.Identity.IsAuthenticated)
+                {
+                    _mailSender.SendEmailContactRequest(
+                        Guid.Parse(_userManager.GetUserId(User)), _userManager.GetUserName(User), recipientEmail, senderEmail, Input.Message, "/Index");
+                    StatusMessage = "Your message has been sent!";
+                }
+                else if (User.Identity.IsAuthenticated == false)
+                {
+                    _mailSender.SendEmailContactRequest(
+                        Guid.Empty, Input.Name, recipientEmail, senderEmail, Input.Message, "/Index");
+                    StatusMessage = "Your Message has been sent!";
+                }
             }
 
-            // Determine the sender email based on user authentication status
-            string senderEmail = User.Identity.IsAuthenticated ? User.Identity.Name : Input.ClientEmail;
-
-            // User must be authenticated as this contact is ONLY for authenticated users, and will use their authenticated email address as the user contact.
-            if (Input != null && User.Identity.IsAuthenticated)
+            catch (Exception ex)
             {
-                _mailSender.SendEmailContactRequest(
-                    Guid.Parse(_userManager.GetUserId(User)),
-                    _userManager.GetUserName(User),
-                    recipientEmail,
-                    senderEmail,
-                    Input.Message,
-                    "/Index"
-                );
-
-                StatusMessage = "Your message has been sent!";
-            }
-            else
-            {
+                _logger.LogError(ex, "An error occurred while sending a message");
                 StatusMessage = "Error: An error occurred while sending your message";
             }
+
+            return RedirectToPage();
         }
 
 

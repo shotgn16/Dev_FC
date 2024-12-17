@@ -18,7 +18,7 @@ namespace ForestChurches.Pages.Admin
         private readonly ForestChurchesContext _context;
         private readonly ILogger<InviteModel> _logger;
         private readonly iRegistrationGenerate _register;
-        private readonly iEmail _mailSender;
+        private readonly iMailSender _mailSender;
 
         internal List<WhitelistedUsers> invites;
         string _url;
@@ -26,7 +26,7 @@ namespace ForestChurches.Pages.Admin
         [TempData]
         public string StatusMessage { get; set; }
 
-        public InviteModel(ForestChurchesContext context, ILogger<InviteModel> logger, iRegistrationGenerate register, iEmail mailSender)
+        public InviteModel(ForestChurchesContext context, ILogger<InviteModel> logger, iRegistrationGenerate register, iMailSender mailSender)
         {
             _register = register;
             _context = context;
@@ -56,13 +56,8 @@ namespace ForestChurches.Pages.Admin
 
                 // Send an email to the user telling them they are Invited
                 _url = _register.GenerateUrl(HttpContext.Request, email);
-                var emailData = new Dictionary<string, string>()
-                {
-                    { "{email}", email },
-                    { "{registration_link}", _url },
-                };
 
-                await _mailSender.StartEmailAsync(email, emailData, "You're Invited", "./templates/registration_invite.html");
+                _mailSender.SendEmailInviteUser(email, _url);
                 _context.SaveChanges();
             }
 
@@ -95,7 +90,8 @@ namespace ForestChurches.Pages.Admin
                     { "{registration_link}", _url },
                 };
 
-                await _mailSender.StartEmailAsync(email, emailData, "You're Invited", "./templates/registration_invite.html"); 
+                _mailSender.SendEmailInviteUser(email, _url);
+
             }
 
             return RedirectToPage();

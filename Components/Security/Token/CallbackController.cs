@@ -1,54 +1,43 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ForestChurches.Components.Token
 {
-    [Route("callback")]
+    [Route("Callback")]
     public class CallbackController : Controller
     {
         private readonly CallbackTokenDataFormat _tokenDataFormat;
+        private readonly ILogger<CallbackController> _logger;
 
-        public CallbackController(IDataProtectionProvider dataProtectionProvider)
+        public CallbackController(IDataProtectionProvider dataProtectionProvider, ILogger<CallbackController> logger)
         {
-            // Initialize CallbackTokenDataFormat with the injected IDataProtectionProvider
-            _tokenDataFormat = new CallbackTokenDataFormat(dataProtectionProvider, "User  Registration");
+            _logger = logger;
+            _tokenDataFormat = new CallbackTokenDataFormat(dataProtectionProvider, "User Registration");
         }
 
-        [HttpGet("{token}")]
-        public IActionResult HandleCallback(string token)
+        [HttpGet("ValidateToken")]
+        public IActionResult ValidateToken(string token)
         {
             try
             {
-                // Unprotect the token
+                _logger.LogInformation("Received token: {Token}", token);
                 var callbackToken = _tokenDataFormat.Unprotect(token);
 
-                // Check if the token has expired
+                _logger.LogInformation("Unprotected token: {CallbackToken}", JsonConvert.SerializeObject(callbackToken));
+
                 if (callbackToken.ExpirationTime < DateTime.UtcNow)
                 {
-                    // Token has expired
-                    return RedirectToAction("TokenExpired"); // Redirect to an expired token page
+                    return BadRequest("Token has expired.");
                 }
 
-                // Token is valid, proceed with the redirect
-                return Redirect(callbackToken.RedirectUrl);
+                return Ok(callbackToken.RedirectUrl);
             }
             catch (Exception ex)
             {
-                // Handle any exceptions (e.g., token invalid)
-                return RedirectToAction("TokenInvalid"); // Redirect to an invalid token page
+                _logger.LogError(ex, "Token validation failed.");
+                return BadRequest("Token is invalid.");
             }
-        }
-
-        public IActionResult TokenExpired()
-        {
-            // Return a view or message indicating the token has expired
-            return View("TokenExpired"); // Ensure you have a view named TokenExpired
-        }
-
-        public IActionResult TokenInvalid()
-        {
-            // Return a view or message indicating the token is invalid
-            return View("TokenInvalid"); // Ensure you have a view named TokenInvalid
         }
     }
 }

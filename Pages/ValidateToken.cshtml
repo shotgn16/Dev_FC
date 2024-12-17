@@ -1,0 +1,20 @@
+﻿@page
+@model ForestChurches.Pages.ValidateTokenModel
+@{
+    ViewData["Title"] = "Validating...";
+}
+
+<h3>Validate Token</h3>
+
+@if (Model.IsValidating)
+{
+    <p>Validating token...</p>
+}
+else if (Model.IsTokenValid)
+{
+    <p>Token is valid. Redirecting...</p>
+}
+else
+{
+    <p>Token is invalid or expired.</p>
+}

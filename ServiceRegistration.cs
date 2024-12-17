@@ -18,6 +18,7 @@ using ForestChurches.Areas.Identity.Data;
 using ForestChurches.Components.Performance;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ForestChurches.Services;
+using ServiceStack;
 
 namespace ForestChurches
 {
@@ -43,6 +44,7 @@ namespace ForestChurches
             Services.AddTransient<UserInterface, UsersController>();
             Services.AddTransient<RolesInterface, RolesController>();
             Services.AddTransient<PermissionsInterface, PermissionController>();
+            Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             Services.AddTransient<iMailSender, MailSender>();
             Services.AddTransient<CallbackToken>();

@@ -6,68 +6,32 @@
     <link rel="stylesheet" href="~/css2/contact-page.css" asp-append-version="true" />
 </head>
 
-<style>
-    img {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 5vw;
-        max-width: calc(15rem + 1.0vw)
-    }
+<div class="container">
+    <div class="contact-us form">
+        <header>
+            <img class="mb-4" src="~/img/logo.png" alt="" width="300" height="200">
+        </header>
+        <form method="post">
+            <!-- Email [Pre-filled] -->
+            <span asp-validation-for="Input.Name" class="text-danger"></span>
+            <input type="text" asp-for="Input.Name" placeholder="Enter your name" required>
 
-    h1 {
-        text-align: center;
-    }
- </style>
+            <!-- Password -->
+            <span asp-validation-for="Input.Subject" class="text-danger"></span>
+            <input type="text" asp-for="Input.Subject" placeholder="What's your enquiry?" required>
 
-<partial name="_StatusMessage" model="Model.StatusMessage" />
-
-<section>
-    <img src="~/img/logo.png" alt="Forest Church Logo" class="center-image" />
-    <h1>Contact Us</h1>
-
-    <form id="contactForm" method="post">
-        <!-- Form container-->
-        <div class="form-container">
-            <!-- Asp Validation -->
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-        
-            <!-- Your Name -->
-            <div class="form-floating full-width">
-                <input type="text" asp-for="@Model.Input.Name" class="form-control" autocomplete="on" aria-required="true" />
-                <label asp-for="@Model.Input.Name">Your Name</label>
-                <span asp-validation-for="@Model.Input.Name" class="text-danger"></span>
-            </div>
-
-            <!-- Subject -->
-            <div class="form-floating half-width">
-                <input type="text" asp-for="@Model.Input.Subject" class="form-control" autocomplete="on" aria-required="true" />
-                <label asp-for="@Model.Input.Subject">Subject</label>
-                <span asp-validation-for="@Model.Input.Subject" class="text-danger"></span>
-            </div>
-
-            <!-- Your Email (Sender Email) -->
-            <div class="form-floating half-width">
-                <input type="email" asp-for="@Model.Input.ClientEmail" class="form-control" autocomplete="on" aria-required="true" />
-                <label asp-for="@Model.Input.ClientEmail">Your Email</label>
-                <span asp-validation-for="@Model.Input.ClientEmail" class="text-danger"></span>
-            </div>
+            <!-- Password twice -->
+            <span asp-validation-for="Input.ClientEmail" class="text-danger"></span>
+            <input type="email" asp-for="Input.ClientEmail" placeholder="How can we get in touch with you?" required>
 
             <!-- Message -->
-            <div class="form-floating full-width">
-                <input type="text" asp-for="@Model.Input.Message" class="form-control" autocomplete="on" aria-required="true" />
-                <label asp-for="@Model.Input.Message">Message</label>
-                <span asp-validation-for="@Model.Input.Message" class="text-danger"></span>
-            </div>
+            <span asp-validation-for="Input.Message" class="text-danger"></span>
+            <textarea class="form-control" type="text" asp-for="Input.Message" placeholder="What's up?" rows="3" required></textarea>
 
-            <!-- Hidden Inputs-->
-            <input type="hidden" value="@Model.Input.Cid" />
-
-            <!-- Submit (Button) -->
-            <button type="submit" class="w-100 btn btn-success">Send Message</button>
-        </div>
-    </form>
-</section>
+            <button id="contact-usSubmit" type="submit" class="half-width w-100 btn btn-lg btn-success">Sign Up</button>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

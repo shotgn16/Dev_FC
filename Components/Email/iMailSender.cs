@@ -11,5 +11,6 @@ namespace ForestChurches.Components.Email
         void SendEmailRegisteredUser(Guid uid, string un, string redirectUrl);
         void SendEmailEventValidate(Guid uid, string un, string redirectUrl, EventsModel eventItem);
         void SendEmailResetPassword(Guid uid, string un, string redirectUrl);
+        void SendEmailInviteUser(string invitedEmail, string redirectUrl);
     }
 }
